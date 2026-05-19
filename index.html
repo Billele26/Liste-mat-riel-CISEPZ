@@ -13,7 +13,9 @@
 <title>Liste By Cisepz</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;--amber:#f0a500;--text:#e6edf3;--muted:#8b949e;--red:#f85149;--green:#3fb950;--radius:10px}
@@ -254,26 +256,17 @@ select option{background:var(--surface2);color:var(--text)}
         </button>
       </div>
       <div class="actions-grid">
-        <button class="action-btn" onclick="togglePreview()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          <span id="preview-btn-text">Voir l'aperçu texte</span>
-        </button>
-        <!-- PDF buttons -->
         <button class="action-btn pdf-btn" onclick="downloadPDF()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
           Télécharger PDF
         </button>
-        <button class="action-btn email-pdf-btn" onclick="openEmailPDFModal()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          Envoyer PDF par Email
+        <button class="action-btn" style="border-color:#1d6f42;color:#1d6f42;font-weight:700" onclick="downloadExcel()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+          Télécharger Excel
         </button>
         <button class="action-btn" onclick="sendEmail()">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-          Envoyer par Email (texte)
-        </button>
-        <button class="action-btn" onclick="sendWhatsApp()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-          Envoyer par WhatsApp
+          Envoyer par Email
         </button>
         <button class="action-btn danger" onclick="confirmClear()" id="btn-clear">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
@@ -782,6 +775,70 @@ function showToast(msg,type='ok'){
 }
 
 // ===== SERVICE WORKER =====
+
+// ========== EXCEL EXPORT ==========
+function downloadExcel(){
+  if(!savedData.length){showToast('Liste vide','err');return}
+  if(!window.XLSX){showToast('Chargement en cours...','err');return}
+  try{
+    const d=getDeliveryInfo();
+    const now=new Date();
+
+    // Build rows
+    const rows=[];
+    // Header info rows
+    rows.push(['LISTE MATERIEL - CISEPZ Genie Climatique','','','','','','']);
+    rows.push(['Date:',now.toLocaleDateString('fr-FR'),'','','','','']);
+    if(d.companion) rows.push(['Compagnon:',d.companion,'','','','','']);
+    if(d.site) rows.push(['N chantier:',d.site,'','','','','']);
+    if(d.date) rows.push(['Date livraison:',new Date(d.date).toLocaleDateString('fr-FR'),'','','','','']);
+    if(d.location) rows.push(['Lieu:',d.location,'','','','','']);
+    rows.push(['','','','','','','']);
+
+    // Column headers
+    rows.push(['RESEAU','MATERIEL','DIAMETRE','QUANTITE','CHANTIER','DATE CREATION','']);
+
+    // Data rows grouped by network
+    const grouped={};
+    savedData.forEach(it=>{const k=it.network_type||'Autre';if(!grouped[k])grouped[k]=[];grouped[k].push(it)});
+    Object.entries(grouped).forEach(([net,items])=>{
+      items.forEach(it=>{
+        rows.push([
+          net,
+          it.item_key,
+          'O'+it.diameter,
+          it.quantity,
+          it.project_name||'',
+          it.created_at?new Date(it.created_at).toLocaleDateString('fr-FR'):'',
+          ''
+        ]);
+      });
+    });
+
+    rows.push(['','','','','','','']);
+    rows.push(['Total elements:',savedData.length,'','','','','']);
+
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+
+    // Column widths
+    ws['!cols']=[{wch:18},{wch:42},{wch:12},{wch:10},{wch:20},{wch:16},{wch:5}];
+
+    // Style header row (row 8 = index 7)
+    const headerRow=7;
+    ['A','B','C','D','E','F'].forEach(col=>{
+      const cell=ws[col+(headerRow+1)];
+      if(cell) cell.s={font:{bold:true},fill:{fgColor:{rgb:'0D1117'}},font:{color:{rgb:'F0A500'},bold:true}};
+    });
+
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Liste Materiel');
+
+    const dateStr=now.toISOString().split('T')[0];
+    XLSX.writeFile(wb,'liste-materiel-cisepz-'+dateStr+'.xlsx');
+    showToast('Excel telecharge !');
+  }catch(e){console.error(e);showToast('Erreur Excel','err')}
+}
+
 if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
 
 renderNetworks();updateBadge();
