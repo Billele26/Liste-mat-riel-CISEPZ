@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#b8e4f4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Liste Cisepz">
+<meta name="description" content="Préparation matériel chantier — CISEPZ Génie Climatique">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Liste By Cisepz</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;--amber:#f0a500;--text:#e6edf3;--muted:#8b949e;--red:#f85149;--green:#3fb950;--radius:10px}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--text);font-size:14px;-webkit-tap-highlight-color:transparent}
+header{background:linear-gradient(135deg,#b8e4f4 0%,#d6f0fa 40%,#b8e4f4 100%);border-bottom:3px solid #000;padding:env(safe-area-inset-top,0) 0 0;position:sticky;top:0;z-index:100}
+.header-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 16px}
+.cisepz-logo{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+.cisepz-wordmark{display:flex;align-items:center;gap:8px}
+.cisepz-icon{width:34px;height:34px;flex-shrink:0}
+.cisepz-name{font-size:24px;font-weight:900;letter-spacing:.04em;color:#000;line-height:1}
+.cisepz-sub{font-size:8px;font-weight:600;letter-spacing:.22em;color:#000;text-transform:uppercase;padding-left:42px}
+.header-right{display:flex;align-items:center;gap:10px}
+.app-label{text-align:right}
+.app-label-top{font-size:10px;font-weight:700;letter-spacing:.08em;color:#000;text-transform:uppercase}
+.app-label-bot{font-size:8px;color:#333;letter-spacing:.05em;font-family:'JetBrains Mono',monospace}
+.btn-icon{background:rgba(0,0,0,0.08);border:1.5px solid rgba(0,0,0,0.2);color:#000;padding:8px;border-radius:var(--radius);cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;-webkit-appearance:none}
+.btn-icon:active{background:rgba(0,0,0,0.18)}
+.badge{position:absolute;top:-5px;right:-5px;background:#000;color:#7ec8e3;font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center}
+#install-banner{display:none;background:#000;color:#7ec8e3;padding:10px 16px;align-items:center;justify-content:space-between;gap:10px;font-size:12px;font-weight:500}
+#install-banner button{background:var(--amber);color:#000;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+#install-banner .close-banner{background:none;border:none;color:#7ec8e3;font-size:18px;cursor:pointer;padding:0 4px}
+main{max-width:720px;margin:0 auto;padding:16px 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.view{display:none;animation:fadeIn .2s ease}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.section-label{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.networks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:400px){.networks-grid{grid-template-columns:repeat(2,1fr)}}
+.net-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 10px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:5px;-webkit-appearance:none;width:100%}
+.net-card:active{border-color:var(--amber);background:var(--surface2)}
+.net-card .net-icon{font-size:20px}
+.net-card .net-name{font-weight:600;font-size:12px;color:var(--text)}
+.net-card .net-desc{font-size:10px;color:var(--muted)}
+.back-btn{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;font-family:'Space Grotesk',sans-serif;padding:0;margin-bottom:16px;-webkit-appearance:none}
+.back-btn:active{color:var(--amber)}
+.back-btn svg{width:16px;height:16px}
+.view-header{margin-bottom:14px}
+.view-title{font-size:18px;font-weight:700;color:var(--text)}
+.view-sub{font-size:11px;color:var(--muted)}
+input[type=text],input[type=date],input[type=email],select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-size:13px;font-family:'Space Grotesk',sans-serif;outline:none;transition:border .15s;margin-bottom:10px;-webkit-appearance:none;appearance:none}
+input[type=text]:focus,input[type=date]:focus,input[type=email]:focus,select:focus{border-color:var(--amber)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+select option{background:var(--surface2);color:var(--text)}
+.cat-block{margin-bottom:8px}
+.cat-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;width:100%;-webkit-appearance:none}
+.cat-header:active{border-color:var(--amber)}
+.cat-name{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--amber);font-family:'JetBrains Mono',monospace;text-align:left}
+.cat-arrow{color:var(--muted);font-size:11px;transition:transform .2s;flex-shrink:0}
+.cat-arrow.open{transform:rotate(180deg)}
+.cat-items{display:none;padding:6px 0 4px}
+.cat-items.open{display:block}
+.mat-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:6px}
+.mat-name{font-size:12px;font-weight:500;margin-bottom:8px;color:var(--text)}
+.diams{display:flex;flex-wrap:wrap;gap:5px}
+.diam-chip{display:flex;align-items:center;gap:5px;padding:6px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;font-size:11px;cursor:pointer;user-select:none}
+.diam-chip:active{border-color:var(--amber)}
+.diam-chip.selected{border-color:var(--amber);background:rgba(240,165,0,.08)}
+.diam-chip input[type=checkbox]{accent-color:var(--amber);width:13px;height:13px;cursor:pointer;flex-shrink:0}
+.diam-label{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:10px}
+.diam-chip.selected .diam-label{color:var(--amber)}
+.qty-input{width:42px;background:var(--surface);border:1px solid var(--amber);border-radius:5px;padding:2px 4px;text-align:center;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--amber);outline:none;display:none;margin:0}
+.diam-chip.selected .qty-input{display:inline-block}
+.custom-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:6px}
+.custom-row .mat-name{color:var(--muted);font-style:italic}
+.custom-input-row{display:flex;gap:8px}
+.custom-input-row input{margin:0;flex:1;min-width:0}
+.custom-add-btn{background:var(--amber);color:#000;border:none;border-radius:7px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;white-space:nowrap;flex-shrink:0}
+.custom-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.custom-chip{display:flex;align-items:center;gap:6px;padding:6px 9px;background:rgba(240,165,0,.1);border:1px solid var(--amber);border-radius:7px;font-size:12px}
+.custom-chip span{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--amber)}
+.custom-chip input{width:38px;background:var(--surface);border:1px solid var(--amber);border-radius:5px;padding:2px 4px;text-align:center;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--amber);outline:none;margin:0}
+.custom-chip button{background:none;border:none;color:var(--muted);cursor:pointer;padding:0;font-size:14px;line-height:1}
+.sticky-bar{position:sticky;bottom:0;padding:10px 0 calc(env(safe-area-inset-bottom,0px) + 10px);background:linear-gradient(to top,var(--bg) 60%,transparent)}
+.add-btn{width:100%;padding:14px;background:var(--amber);color:#000;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-appearance:none}
+.add-btn:active{opacity:.85}
+.add-btn:disabled{opacity:.35;cursor:not-allowed}
+.list-group{margin-bottom:16px}
+.list-group-title{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--amber);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.list-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.list-item-info{flex:1;min-width:0}
+.list-item-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item-meta{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.qty-ctrl{display:flex;align-items:center;gap:6px;margin:0 10px;flex-shrink:0}
+.qty-ctrl button{background:var(--surface2);border:1px solid var(--border);color:var(--muted);width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;-webkit-appearance:none}
+.qty-ctrl button:active{border-color:var(--amber);color:var(--amber)}
+.qty-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--amber);min-width:28px;text-align:center}
+.del-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;display:flex;flex-shrink:0}
+.del-btn:active{color:var(--red)}
+.delivery-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.delivery-title{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--amber);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+.preview-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.preview-text{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:12px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);max-height:160px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;line-height:1.6}
+.actions-grid{display:grid;gap:8px}
+.action-btn{padding:13px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-appearance:none;width:100%}
+.action-btn:active{border-color:var(--amber);color:var(--amber)}
+.action-btn.danger:active{border-color:var(--red);color:var(--red)}
+.action-btn.pdf-btn{border-color:#e74c3c;color:#e74c3c}
+.action-btn.pdf-btn:active{background:rgba(231,76,60,.1)}
+.action-btn.email-pdf-btn{border-color:#9b59b6;color:#9b59b6}
+.action-btn.email-pdf-btn:active{background:rgba(155,89,182,.1)}
+
+/* Modal PDF email */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:400px;animation:fadeIn .2s ease}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(--muted);margin-bottom:20px}
+.modal-actions{display:flex;gap:8px;margin-top:4px}
+.modal-cancel{flex:1;padding:12px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.modal-send{flex:1;padding:12px;background:#9b59b6;color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.modal-send:active{opacity:.85}
+
+.confirm-row{display:flex;gap:8px;margin-top:4px}
+.confirm-row button{flex:1;padding:12px;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;-webkit-appearance:none}
+.confirm-yes{background:var(--red);color:#fff;border:none}
+.confirm-no{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.empty{text-align:center;padding:48px 0;color:var(--muted)}
+.empty .empty-icon{font-size:40px;margin-bottom:12px}
+.empty p{font-size:13px}
+.toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:var(--radius);font-size:13px;font-weight:600;z-index:999;pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap}
+.toast.show{opacity:1}
+.toast.ok{background:var(--green);color:#000}
+.toast.err{background:var(--red);color:#fff}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* PDF EMAIL MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:16px 16px 0 0;border:1px solid var(--border);border-bottom:none;padding:24px 20px calc(env(safe-area-inset-bottom,0px) + 24px);width:100%;max-width:720px;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+.modal-actions{display:flex;gap:8px;margin-top:14px}
+.modal-cancel{flex:1;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.modal-send{flex:2;padding:12px;background:#e74c3c;border:none;border-radius:var(--radius);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+.modal-send:active,.modal-cancel:active{opacity:.85}
+.modal-download{flex:2;padding:12px;background:var(--amber);border:none;border-radius:var(--radius);color:#000;font-size:13px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+.modal-download:active{opacity:.85}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div id="install-banner">
+  <span>📲 Installer l'app sur votre téléphone</span>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button id="install-btn">Installer</button>
+    <button class="close-banner" id="close-banner">✕</button>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="cisepz-logo">
+      <div class="cisepz-wordmark">
+        <svg class="cisepz-icon" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="20" cy="20" rx="18" ry="18" stroke="#000" stroke-width="3.5" fill="none"/>
+          <ellipse cx="20" cy="20" rx="11" ry="11" fill="#000"/>
+          <ellipse cx="20" cy="20" rx="5" ry="5" fill="white"/>
+          <rect x="0" y="17" width="4" height="6" rx="1" fill="#000"/>
+          <rect x="36" y="17" width="4" height="6" rx="1" fill="#000"/>
+        </svg>
+        <span class="cisepz-name">CiSEPZ</span>
+      </div>
+      <div class="cisepz-sub">Génie Climatique</div>
+    </div>
+    <div class="header-right">
+      <div class="app-label">
+        <div class="app-label-top">Liste Matériel</div>
+        <div class="app-label-bot">préparation chantier</div>
+      </div>
+      <button class="btn-icon" onclick="showLists()" title="Voir la liste">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+        <span class="badge" id="badge" style="display:none">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Networks -->
+  <div class="view active" id="view-networks">
+    <div class="section-label">Sélectionnez le type de réseau</div>
+    <div class="networks-grid" id="networks-grid"></div>
+  </div>
+
+  <!-- Materials -->
+  <div class="view" id="view-materials">
+    <button class="back-btn" onclick="goHome()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Retour
+    </button>
+    <div class="view-header">
+      <div class="view-title" id="mat-title"></div>
+      <div class="view-sub">Cochez et indiquez les quantités</div>
+    </div>
+    <input type="text" id="project-name" placeholder="Nom du chantier (optionnel)">
+    <div id="mat-categories"></div>
+    <div class="sticky-bar">
+      <button class="add-btn" id="btn-add" onclick="addToList()" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span id="btn-add-text">Ajouter à la liste</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Lists -->
+  <div class="view" id="view-lists">
+    <button class="back-btn" onclick="goHome()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Retour
+    </button>
+    <div class="view-header"><div class="view-title">Liste de matériel</div></div>
+    <div id="saved-items"></div>
+    <div id="empty-list" class="empty" style="display:none">
+      <div class="empty-icon">📦</div>
+      <p>Aucun matériel pour le moment</p>
+    </div>
+    <div id="list-extras" style="display:none">
+      <div class="delivery-section">
+        <div class="delivery-title">Informations de livraison</div>
+        <input type="text" id="companion-name" placeholder="Nom du compagnon">
+        <input type="text" id="site-number" placeholder="N° de chantier (ex: A26-5789)">
+        <input type="date" id="delivery-date">
+        <select id="delivery-location">
+          <option value="">-- Sélectionner le lieu --</option>
+          <option value="CISEPZ">CISEPZ</option>
+          <option value="Chantier">Chantier</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div class="preview-box" id="preview-box" style="display:none">
+        <div class="delivery-title" style="margin-bottom:8px">Aperçu de l'export</div>
+        <div class="preview-text" id="preview-text"></div>
+        <button class="action-btn" onclick="copyText()" style="margin-top:10px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copier le texte
+        </button>
+      </div>
+      <div class="actions-grid">
+        <button class="action-btn" onclick="togglePreview()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          <span id="preview-btn-text">Voir l'aperçu texte</span>
+        </button>
+        <!-- PDF buttons -->
+        <button class="action-btn pdf-btn" onclick="downloadPDF()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Télécharger PDF
+        </button>
+        <button class="action-btn email-pdf-btn" onclick="openEmailPDFModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Envoyer PDF par Email
+        </button>
+        <button class="action-btn" onclick="sendEmail()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Envoyer par Email (texte)
+        </button>
+        <button class="action-btn" onclick="sendWhatsApp()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+          Envoyer par WhatsApp
+        </button>
+        <button class="action-btn danger" onclick="confirmClear()" id="btn-clear">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+          Tout supprimer
+        </button>
+        <div class="confirm-row" id="confirm-row" style="display:none">
+          <button class="confirm-yes" onclick="clearAll()">Confirmer</button>
+          <button class="confirm-no" onclick="cancelClear()">Annuler</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Modal Email PDF -->
+<div class="modal-overlay" id="modal-email-pdf">
+  <div class="modal">
+    <div class="modal-title">📧 Envoyer le PDF par email</div>
+    <div class="modal-sub">Le PDF sera généré et joint à votre email</div>
+    <input type="email" id="email-recipient" placeholder="adresse@email.com" style="margin-bottom:8px">
+    <input type="text" id="email-subject" placeholder="Objet de l'email" style="margin-bottom:16px">
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeEmailModal()">Annuler</button>
+      <button class="modal-send" id="modal-send-btn" onclick="sendPDFEmail()">
+        <span id="modal-send-label">Envoyer</span>
+      </button>
+    </div>
+    <p style="font-size:10px;color:var(--muted);margin-top:12px;text-align:center">Le PDF s'ouvrira avec votre client email. Joignez-le manuellement si nécessaire.</p>
+  </div>
+</div>
+
+
+<!-- PDF EMAIL MODAL -->
+<div class="modal-overlay" id="pdf-modal" onclick="closePdfModal(event)">
+  <div class="modal">
+    <div class="modal-title">&#128196; Générer le PDF</div>
+    <div class="modal-sub">Téléchargez le PDF ou envoyez-le directement par email</div>
+    <input type="email" id="email-to" placeholder="Adresse email du destinataire" style="margin-bottom:8px">
+    <input type="text" id="email-subject" placeholder="Objet du mail" style="margin-bottom:0">
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closePdfModalDirect()">Annuler</button>
+      <button class="modal-download" onclick="downloadPdf()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Télécharger PDF
+      </button>
+      <button class="modal-send" id="send-email-btn" onclick="sendPdfEmail()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Envoyer
+      </button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const NETWORKS=[
+  {id:'cuivre',name:'Cuivre',icon:'🔴',desc:'Tubes & raccords cuivre'},
+  {id:'multicouche',name:'Multicouche',icon:'🔵',desc:'Tubes & raccords MC'},
+  {id:'per',name:'PER',icon:'🟠',desc:'Tubes & raccords PER'},
+  {id:'acier',name:'Acier',icon:'⚫',desc:'Tubes & raccords acier'},
+  {id:'inox',name:'Inox',icon:'✨',desc:'Tubes & raccords inox'},
+  {id:'pvc',name:'PVC / Évac.',icon:'⚪',desc:'Tubes & raccords PVC'},
+  {id:'collier_hilti',name:'Collier Hilti',icon:'🔗',desc:'Colliers & supports'},
+  {id:'gaine',name:'Gaines CVC',icon:'🟢',desc:'Gaines & accessoires'},
+  {id:'accessoires',name:'Accessoires',icon:'🔧',desc:'Fixations & boulonnerie'},
+  {id:'materiaux',name:'Matériaux',icon:'🧴',desc:'Adhésifs & consommables'},
+  {id:'isolation',name:'Isolation',icon:'🛡️',desc:'Supports & accessoires'}
+];
+const MATERIALS={
+  cuivre:{'Tubes cuivre':[{name:'Tube cuivre écroui',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']},{name:'Tube cuivre recuit (couronne)',diameters:['10/12','12/14','14/16','16/18']},{name:'Couronne Tricoclair',diameters:['16x22','20x27']}],'Raccords a souder':[{name:'Coude 90',diameters:['12','14','16','18','22','28','35','42']},{name:'Coude 45',diameters:['12','14','16','18','22','28']},{name:'Te egal',diameters:['12','14','16','18','22','28','35','42']},{name:'Manchon',diameters:['12','14','16','18','22','28','35','42']},{name:'Reduction',diameters:['14/12','16/14','18/16','22/18','28/22','35/28','42/35']},{name:'Bouchon',diameters:['12','14','16','18','22','28']}],'Raccords laiton':[{name:'Raccord droit male',diameters:['12-3/8','14-1/2','16-1/2','18-3/4','22-3/4','28-1']},{name:'Raccord droit femelle',diameters:['12-3/8','14-1/2','16-1/2','18-3/4','22-3/4','28-1']},{name:'Coude male',diameters:['12-3/8','14-1/2','16-1/2','18-3/4','22-3/4']},{name:'Coude femelle',diameters:['12-3/8','14-1/2','16-1/2','18-3/4','22-3/4']}],'Vannes':[{name:"Vanne d'arret a souder",diameters:['12','14','16','18','22','28']},{name:"Robinet d'arret droit",diameters:['12','14','16','18','22']},{name:"Robinet d'arret equerre",diameters:['12','14']}],'Accessoires':[{name:'Collier isophonique',diameters:['12','14','16','18','22','28','35','42']},{name:'Rosace',diameters:['12','14','16','18','22','28']},{name:'Fourreau',diameters:['14','16','18','22','28']}]},
+  multicouche:{'Tubes multicouche':[{name:'Tube MC barre 5m',diameters:['16','20','26','32']},{name:'Tube MC couronne',diameters:['16','20','26']},{name:'Tube pre-gaine',diameters:['16','20','26']}],'Raccords a sertir':[{name:'Coude 90 a sertir',diameters:['16','20','26','32']},{name:'Coude 45 a sertir',diameters:['16','20','26']},{name:'Te egal a sertir',diameters:['16','20','26','32']},{name:'Manchon a sertir',diameters:['16','20','26','32']},{name:'Reduction a sertir',diameters:['20/16','26/20','32/26']},{name:'Bouchon a sertir',diameters:['16','20','26','32']}],'Raccords mixtes':[{name:'Raccord droit male',diameters:['16-1/2','20-1/2','20-3/4','26-3/4','26-1','32-1']},{name:'Raccord droit femelle',diameters:['16-1/2','20-1/2','20-3/4','26-3/4','26-1']},{name:'Coude male applique',diameters:['16-1/2','20-1/2']},{name:'Coude femelle applique',diameters:['16-1/2','20-1/2']}],'Collecteurs':[{name:'Collecteur 2 departs',diameters:['16','20']},{name:'Collecteur 4 departs',diameters:['16','20']},{name:"Vanne d'arret MC",diameters:['16','20','26','32']}]},
+  per:{'Tubes PER':[{name:'Tube PER nu couronne',diameters:['12','16','20','25']},{name:'Tube PER gaine',diameters:['12','16','20','25']},{name:'Tube PER BAO rouge',diameters:['12','16','20']},{name:'Tube PER BAO bleu',diameters:['12','16','20']}],'Raccords a glissement':[{name:'Coude 90',diameters:['12','16','20','25']},{name:'Te egal',diameters:['12','16','20','25']},{name:'Manchon',diameters:['12','16','20','25']},{name:'Raccord droit male',diameters:['12-3/8','16-1/2','20-3/4','25-1']},{name:'Raccord droit femelle',diameters:['12-3/8','16-1/2','20-3/4','25-1']}],'Collecteurs':[{name:'Collecteur plancher chauffant',diameters:['2 circuits','3 circuits','4 circuits','5 circuits','6 circuits','8 circuits','10 circuits','12 circuits']},{name:'Nourrice sanitaire',diameters:['2 departs','3 departs','4 departs','6 departs']},{name:'Platine PER',diameters:['12','16','20','25']}],'Accessoires PER':[{name:'Fix Ring Simple',diameters:['20/12 PER','25/16 PER']},{name:'Fix Ring Double',diameters:['20/12 PER','25/16 PER']}]},
+  acier:{'Tubes acier':[{name:'Tube acier noir barre 6m',diameters:['DN15','DN20','DN25','DN32','DN40','DN50','DN65','DN80','DN100']},{name:'Tube acier galvanise',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']}],'Raccords acier noir':[{name:'Coude 90 FM',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Coude 90 FF',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Te FF',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Mamelon',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Manchon FF',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Reduction MF',diameters:['DN20/15','DN25/20','DN32/25','DN40/32','DN50/40']},{name:'Bouchon',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']}],'Vannes acier':[{name:'Vanne papillon',diameters:['DN50','DN65','DN80','DN100','DN125','DN150','DN200']},{name:'Vanne a boisseau spherique',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Clapet anti-retour',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']}]},
+  inox:{'Tubes inox':[{name:'Tube inox 316L barre 6m',diameters:['DN15','DN20','DN25','DN32','DN40','DN50','DN65','DN80','DN100']},{name:'Tube inox 304',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Tube inox soude',diameters:['10','12','14','16','18','20','22','28']}],'Raccords inox':[{name:'Coude 90 inox',diameters:['12','14','16','18','22','28','35','42']},{name:'Coude 45 inox',diameters:['12','14','16','18','22','28']},{name:'Te egal inox',diameters:['12','14','16','18','22','28','35','42']},{name:'Manchon inox',diameters:['12','14','16','18','22','28','35','42']},{name:'Reduction inox',diameters:['14/12','16/14','18/16','22/18','28/22','35/28','42/35']},{name:'Bouchon inox',diameters:['12','14','16','18','22','28']}],'Vannes inox':[{name:"Vanne d'arret inox",diameters:['12','14','16','18','22','28']},{name:"Robinet d'arret inox droit",diameters:['12','14','16','18','22']},{name:'Vanne papillon inox',diameters:['DN50','DN65','DN80','DN100','DN125','DN150','DN200']},{name:'Clapet anti-retour inox',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']}],'Accessoires inox':[{name:'Collier isophonique inox',diameters:['12','14','16','18','22','28','35','42']},{name:'Rosace inox',diameters:['12','14','16','18','22','28']},{name:'Supports fixations inox',diameters:['M8','M10','M12']}]},
+  pvc:{'Tubes PVC':[{name:'Tube PVC barre 4m',diameters:['32','40','50','63','75','80','100','125','160']},{name:'Tube PVC MF barre 4m',diameters:['40','50','100','125','160']}],'Raccords PVC':[{name:'Coude 87-30 MF',diameters:['32','40','50','63','80','100','125','160']},{name:'Coude 45 MF',diameters:['32','40','50','63','80','100','125','160']},{name:'Coude 67-30',diameters:['40','50','100']},{name:'Te 87-30',diameters:['32','40','50','63','80','100','125','160']},{name:'Culotte 45',diameters:['40','50','80','100','125','160']},{name:'Manchon FF',diameters:['32','40','50','63','80','100','125','160']},{name:'Reduction',diameters:['40/32','50/40','63/50','80/63','100/80','125/100','160/125']},{name:'Bouchon',diameters:['32','40','50','63','80','100','125','160']}],'Siphons':[{name:'Siphon lavabo',diameters:['32']},{name:'Siphon evier',diameters:['40']},{name:'Siphon de sol',diameters:['50','63']},{name:'Clapet anti-odeur',diameters:['32','40','50']}],'Fixations':[{name:'Collier a bride',diameters:['32','40','50','63','80','100','125','160']},{name:'Collier isophonique PVC',diameters:['32','40','50','80','100','125','160']}]},
+  collier_hilti:{'Colliers Styro':[{name:'Collier Styro cuivre',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']},{name:'Collier Styro acier',diameters:['DN15','DN20','DN25','DN32','DN40','DN50','DN65','DN80','DN100']},{name:'Collier Styro inox',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']}],'Colliers Armaflex':[{name:'Collier Armaflex cuivre',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']},{name:'Collier Armaflex acier',diameters:['DN15','DN20','DN25','DN32','DN40','DN50','DN65','DN80','DN100']},{name:'Collier Armaflex inox',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']}],'Colliers Isoles':[{name:'Collier isole cuivre',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']},{name:'Collier isole acier',diameters:['DN15','DN20','DN25','DN32','DN40','DN50','DN65','DN80','DN100']},{name:'Collier isole inox',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']}],'Colliers Nus':[{name:'Collier nu cuivre',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']},{name:'Collier nu acier',diameters:['DN15','DN20','DN25','DN32','DN40','DN50','DN65','DN80','DN100']},{name:'Collier nu inox',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']}]},
+  gaine:{'Gaines circulaires':[{name:'Gaine galva spiralee',diameters:['80','100','125','160','200','250','315','400','500','630']},{name:'Gaine flexible alu',diameters:['80','100','125','160','200','250','315']},{name:'Gaine isolee',diameters:['80','100','125','160','200','250','315']}],'Raccords gaines':[{name:'Coude 90',diameters:['80','100','125','160','200','250','315','400']},{name:'Coude 45',diameters:['80','100','125','160','200','250','315']},{name:'Te 90',diameters:['100','125','160','200','250','315']},{name:'Reduction concentrique',diameters:['125/100','160/125','200/160','250/200','315/250','400/315']},{name:'Manchon de raccordement',diameters:['80','100','125','160','200','250','315']}],'Diffusion':[{name:"Bouche d'extraction",diameters:['80','100','125','160']},{name:"Bouche d'insufflation",diameters:['100','125','160','200']},{name:'Grille de reprise',diameters:['200x200','300x200','400x200','500x300']},{name:'Registre de reglage',diameters:['100','125','160','200','250','315']}],'Accessoires CVC':[{name:'Collier de suspension',diameters:['80','100','125','160','200','250','315','400']},{name:'Ruban alu',diameters:['standard']},{name:'Mastic aeraulique',diameters:['standard']},{name:'Manchette souple',diameters:['100','125','160','200','250','315']}]},
+  accessoires:{'Colliers Fixations':[{name:'Collier nylon 4.7mm',diameters:['285mm','300mm']},{name:'Collier nylon 3.6mm',diameters:['200mm','300mm']},{name:'Collier Serflex',diameters:['12-22','16-27','20-32','25-40']},{name:'Collier Strong7 Simple',diameters:['12','16','18','22','28','32','40']},{name:'Collier Strong7 Double',diameters:['12','14','16','18','22']},{name:'Bande perforee AG',diameters:['25mm x 25m']}],'Chevilles':[{name:'Cheville Driva vis 12x35',diameters:['standard']},{name:'Cheville placo metal vis',diameters:['standard']},{name:'Cheville a frapper 8x40',diameters:['standard']},{name:'Cheville JET 6x40',diameters:['standard']},{name:'Cheville Grippon Blanc 6',diameters:['sachet 100']},{name:'Cheville Grippon Bleu 8',diameters:['sachet 100']},{name:'Cheville Grippon Marron 8',diameters:['sachet 100']},{name:'Cheville Aggrip Grise 10',diameters:['sachet']},{name:'Cheville Molly MV2 8x53',diameters:['standard']},{name:'Cheville MEX 4x32',diameters:['avec vis','sans vis']},{name:'Cheville MEX 6x37',diameters:['avec vis','sans vis']},{name:'Cheville MEX 6x52',diameters:['avec vis','sans vis']},{name:'Cheville femelle Hilti 8/25',diameters:['standard']},{name:'Goujon AZ 8',diameters:['x75','x90','x115']},{name:'Goujon AZ 10x90',diameters:['standard']}],'Hilti embase de 8':[{name:'Hilti embase de 8',diameters:['x40','x50','x65','x75','x90','x110','x120','x150']}],'Vis Boulonnerie':[{name:'Vis placo TT PH AP 3.5',diameters:['x25','x35']},{name:'Vis autoperceuse HEX AZ 4.2',diameters:['x16','x25']},{name:'Vis autoperceuse 6.3x38',diameters:['standard']},{name:'Tige filetee AZ',diameters:['8','10']},{name:'Ecrou 6 pans AZ 8',diameters:['standard']},{name:'Rondelle plate XL AZ 8',diameters:['standard']}],'Rails Profiles':[{name:'Profil RP2 41x21',diameters:['LG3m']},{name:'Profil RP4 41x41',diameters:['LG3m']},{name:'Rail 41x21',diameters:['LG3m','LG6m']},{name:'Rail 41x41',diameters:['LG3m','LG6m']},{name:'Ecrou rail ERP M8',diameters:['x30','x50']},{name:'Ecrou rail ERP M10',diameters:['x40','x50']}]},
+  materiaux:{"Produits Etancheite":[{name:'Mastic sanitaire',diameters:['blanc','translucide']},{name:'Mastic polyurethane Gepur',diameters:['gris 310ml']},{name:'Pate etancheite Filapat',diameters:['400g']},{name:'Silicone neutre Gesil',diameters:['gris 300ml']},{name:'Ruban Teflon',diameters:['12mm x 12m']},{name:'Teflon fil dentaire',diameters:['standard']}],'Adhesifs':[{name:'Adhesif emballage havane',diameters:['100x50mm']},{name:'Adhesif isolation alu',diameters:['50x50mm']},{name:'Adhesif multi-usage Orange',diameters:['33x50mm']},{name:'Bande adhesive Armaflex',diameters:['15m x 50mm']},{name:'Scotch electricien',diameters:['standard']},{name:'Colle PVC 1L',diameters:['standard']},{name:'Decapant PVC',diameters:['standard']}],'Lubrifiants':[{name:'Degrippant Gefix',diameters:['400ml']},{name:"Huile de coupe Conexy",diameters:['500ml']},{name:'Detecteur fuites Conexy',diameters:['400ml']},{name:'Mousse expansive Gemous',diameters:['500ml']}],'Brasure Soudure':[{name:'Baguette brasure Phosbraz',diameters:['2 5kg']},{name:'Baguette brasure 6% argent PAG60',diameters:['1kg']},{name:'Baguette brasure Cobrox',diameters:['3 5kg']},{name:'Brasure 30% argent nue',diameters:['1kg']}],'Consommables':[{name:'Poupee filasse',diameters:['250g']},{name:'Sacs poubelle 110L',diameters:['lot 20']},{name:'Gants latex EN455',diameters:['boite 100']},{name:'Chiffons blanc coton',diameters:['10kg']},{name:'Chiffon couleur',diameters:['standard']},{name:'Chiffon blanc',diameters:['standard']}]},
+  isolation:{'Supports Anti-Vibrations':[{name:'Silent bloc compression 40 M/M8',diameters:['standard']},{name:'Set 4 plots anti-vibrations ATC 40',diameters:['M/M8']}],'Accessoires Tuyauterie':[{name:'Embase a frapper',diameters:['8x40']},{name:'Embase a visser collier nylon',diameters:['6/9']},{name:'Rallonge PAV',diameters:['7x20','7x30','7x40']},{name:'Rosace plate',diameters:['25']},{name:'Rosace conique',diameters:['HT9','HT14','HT19']}],'Boitiers Electriques':[{name:'Boite derivation 80x80x40 IP55',diameters:['etanche']}]}
+};
+
+let savedData=JSON.parse(localStorage.getItem('cisepz_list_v2')||'[]');
+let selectedItems={};
+let currentNet=null;
+let deferredPrompt=null;
+
+// ===== PWA =====
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  if(!localStorage.getItem('install-dismissed'))document.getElementById('install-banner').style.display='flex';
+});
+document.getElementById('install-btn').addEventListener('click',async()=>{
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  const{outcome}=await deferredPrompt.userChoice;
+  if(outcome==='accepted')showToast('App installee !');
+  deferredPrompt=null;document.getElementById('install-banner').style.display='none';
+});
+document.getElementById('close-banner').addEventListener('click',()=>{
+  localStorage.setItem('install-dismissed','1');document.getElementById('install-banner').style.display='none';
+});
+
+// ===== UTILS =====
+function save(){localStorage.setItem('cisepz_list_v2',JSON.stringify(savedData));updateBadge()}
+function updateBadge(){const b=document.getElementById('badge');if(savedData.length>0){b.style.display='flex';b.textContent=savedData.length>99?'99+':savedData.length}else b.style.display='none'}
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-'+id).classList.add('active');window.scrollTo(0,0)}
+function goHome(){showView('networks')}
+function showLists(){showView('lists');renderList()}
+
+// ===== NETWORKS =====
+function renderNetworks(){
+  const g=document.getElementById('networks-grid');g.innerHTML='';
+  NETWORKS.forEach(n=>{
+    const c=document.createElement('button');c.className='net-card';
+    c.innerHTML=`<div class="net-icon">${n.icon}</div><div class="net-name">${n.name}</div><div class="net-desc">${n.desc}</div>`;
+    c.onclick=()=>selectNet(n.id);g.appendChild(c);
+  });
+}
+function selectNet(id){
+  currentNet=id;selectedItems={};
+  const net=NETWORKS.find(n=>n.id===id);
+  document.getElementById('mat-title').textContent=net.name;
+  document.getElementById('project-name').value='';
+  renderMaterials();showView('materials');
+}
+
+// ===== MATERIALS =====
+function renderMaterials(){
+  const cats=MATERIALS[currentNet];const container=document.getElementById('mat-categories');container.innerHTML='';
+  if(!cats)return;
+  Object.entries(cats).forEach(([catName,items])=>{
+    const block=document.createElement('div');block.className='cat-block';
+    const hdr=document.createElement('button');hdr.className='cat-header';
+    hdr.innerHTML=`<span class="cat-name">${catName}</span><span class="cat-arrow">▼</span>`;
+    const content=document.createElement('div');content.className='cat-items';
+    items.forEach((item,idx)=>{
+      const key=`${currentNet}__${catName}__${idx}`;
+      const row=document.createElement('div');row.className='mat-row';
+      let diamsHTML=item.diameters.map(d=>{
+        const k=`${key}__${d}`;
+        const sn=item.name.replace(/'/g,"\\'");const sd=d.replace(/'/g,"\\'");
+        return `<div class="diam-chip" data-k="${k}" onclick="toggleChip(this,'${k}','${sn}','${sd}')">
+          <input type="checkbox" onchange="event.stopPropagation();toggleChip(this.closest('.diam-chip'),'${k}','${sn}','${sd}')">
+          <span class="diam-label">${d}</span>
+          <input type="number" class="qty-input" min="1" value="1" onclick="event.stopPropagation()" onchange="updateQty('${k}',this.value)">
+        </div>`;
+      }).join('');
+      row.innerHTML=`<div class="mat-name">${item.name}</div><div class="diams">${diamsHTML}</div>`;
+      content.appendChild(row);
+    });
+    const customRow=document.createElement('div');customRow.className='custom-row';
+    customRow.innerHTML=`<div class="mat-name">+ Autre materiel</div>
+      <div class="custom-input-row">
+        <input type="text" placeholder="Nom du materiel" data-cat="${catName}" style="margin:0">
+        <button class="custom-add-btn" onclick="addCustom('${catName}')">Ajouter</button>
+      </div>
+      <div class="custom-chips" data-custom-list="${catName}"></div>`;
+    content.appendChild(customRow);
+    hdr.onclick=()=>{const open=content.classList.toggle('open');hdr.querySelector('.cat-arrow').classList.toggle('open',open)};
+    block.appendChild(hdr);block.appendChild(content);container.appendChild(block);
+  });
+  updateAddBtn();
+}
+function toggleChip(chip,key,name,dia){
+  const cb=chip.querySelector('input[type=checkbox]');const qty=chip.querySelector('.qty-input');
+  if(cb.checked){chip.classList.remove('selected');cb.checked=false;qty.style.display='none';delete selectedItems[key]}
+  else{chip.classList.add('selected');cb.checked=true;qty.style.display='inline-block';selectedItems[key]={name,diameter:dia,quantity:parseInt(qty.value)||1}}
+  updateAddBtn();
+}
+function updateQty(key,val){if(selectedItems[key])selectedItems[key].quantity=Math.max(1,parseInt(val)||1)}
+function addCustom(catName){
+  const inp=document.querySelector(`[data-cat="${catName}"]`);const name=inp.value.trim();
+  if(!name){showToast('Entrez un nom','err');return}
+  const k=`custom__${currentNet}__${catName}__${Date.now()}`;
+  selectedItems[k]={name,diameter:'standard',quantity:1};
+  const list=document.querySelector(`[data-custom-list="${catName}"]`);
+  const chip=document.createElement('div');chip.className='custom-chip';chip.dataset.k=k;
+  chip.innerHTML=`<span>${name}</span><input type="number" min="1" value="1" onchange="updateQty('${k}',this.value)"><button onclick="removeCustom('${k}')">x</button>`;
+  list.appendChild(chip);inp.value='';updateAddBtn();showToast('Ajoute !');
+}
+function removeCustom(k){delete selectedItems[k];document.querySelector(`[data-k="${k}"]`)?.remove();updateAddBtn()}
+function updateAddBtn(){
+  const n=Object.keys(selectedItems).length;const btn=document.getElementById('btn-add');btn.disabled=n===0;
+  document.getElementById('btn-add-text').textContent=n>0?`Ajouter ${n} element${n>1?'s':''} a la liste`:'Ajouter a la liste';
+}
+function addToList(){
+  const items=Object.values(selectedItems);if(!items.length)return;
+  const net=NETWORKS.find(n=>n.id===currentNet);const proj=document.getElementById('project-name').value.trim();
+  const now=new Date().toISOString();
+  items.forEach(item=>{savedData.push({id:Date.now()+'_'+Math.random().toString(36).slice(2),network_type:net.name,item_key:item.name,diameter:item.diameter,quantity:item.quantity,project_name:proj,created_at:now})});
+  save();selectedItems={};showToast(`${items.length} element${items.length>1?'s':''} ajoute${items.length>1?'s':''} !`);goHome();
+}
+
+// ===== LIST =====
+function renderList(){
+  const container=document.getElementById('saved-items');const empty=document.getElementById('empty-list');const extras=document.getElementById('list-extras');
+  if(savedData.length===0){container.innerHTML='';empty.style.display='block';extras.style.display='none';return}
+  empty.style.display='none';extras.style.display='block';
+  const grouped={};savedData.forEach(it=>{const k=it.network_type||'Autre';if(!grouped[k])grouped[k]=[];grouped[k].push(it)});
+  container.innerHTML='';
+  Object.entries(grouped).forEach(([net,items])=>{
+    const sec=document.createElement('div');sec.className='list-group';
+    sec.innerHTML=`<div class="list-group-title">${net}</div>`;
+    items.forEach(it=>{
+      const row=document.createElement('div');row.className='list-item';
+      row.innerHTML=`<div class="list-item-info"><div class="list-item-name">${it.item_key}</div><div class="list-item-meta">${it.diameter}${it.project_name?' · '+it.project_name:''}</div></div>
+      <div class="qty-ctrl"><button onclick="changeQty('${it.id}',-1)">-</button><span class="qty-val" id="qty-${it.id}">${it.quantity}</span><button onclick="changeQty('${it.id}',1)">+</button></div>
+      <button class="del-btn" onclick="deleteItem('${it.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+      sec.appendChild(row);
+    });
+    container.appendChild(sec);
+  });
+}
+function changeQty(id,delta){
+  const it=savedData.find(d=>d.id===id);if(!it)return;
+  it.quantity=Math.max(1,it.quantity+delta);const el=document.getElementById('qty-'+id);if(el)el.textContent=it.quantity;save();
+}
+function deleteItem(id){savedData=savedData.filter(d=>d.id!==id);save();renderList();showToast('Supprime')}
+function confirmClear(){document.getElementById('btn-clear').style.display='none';document.getElementById('confirm-row').style.display='flex'}
+function cancelClear(){document.getElementById('btn-clear').style.display='flex';document.getElementById('confirm-row').style.display='none'}
+function clearAll(){savedData=[];save();cancelClear();renderList();showToast('Liste videe')}
+
+// ===== PDF GENERATION =====
+function getDeliveryInfo(){
+  return {
+    companion:document.getElementById('companion-name').value.trim(),
+    site:document.getElementById('site-number').value.trim(),
+    date:document.getElementById('delivery-date').value,
+    location:document.getElementById('delivery-location').value
+  };
+}
+
+function generatePDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,margin=14;
+  const info=getDeliveryInfo();
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('fr-FR');
+  const timeStr=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+
+  // ── HEADER BAR ──
+  doc.setFillColor(184,228,244); // bleu CISEPZ
+  doc.rect(0,0,W,28,'F');
+  doc.setFillColor(0,0,0);
+  doc.rect(0,28,W,1.5,'F');
+
+  // Logo CISEPZ text
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(22);
+  doc.setTextColor(0,0,0);
+  doc.text('CiSEPZ',margin,17);
+
+  doc.setFontSize(7);
+  doc.setFont('helvetica','normal');
+  doc.setCharSpace(2);
+  doc.text('GENIE CLIMATIQUE',margin,23);
+  doc.setCharSpace(0);
+
+  // Title right
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(11);
+  doc.setTextColor(0,0,0);
+  doc.text('LISTE DE MATERIEL',W-margin,13,{align:'right'});
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(60,60,60);
+  doc.text('Preparation chantier',W-margin,19,{align:'right'});
+  doc.text(`Genere le ${dateStr} a ${timeStr}`,W-margin,24,{align:'right'});
+
+  let y=36;
+
+  // ── INFO LIVRAISON ──
+  const hasInfo=info.companion||info.site||info.date||info.location;
+  if(hasInfo){
+    doc.setFillColor(240,165,0);
+    doc.rect(margin,y,W-margin*2,0.8,'F');
+    y+=4;
+    doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(240,165,0);
+    doc.text('INFORMATIONS DE LIVRAISON',margin,y);
+    y+=5;
+    doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(40,40,40);
+    const cols=[];
+    if(info.companion)cols.push(`Compagnon: ${info.companion}`);
+    if(info.site)cols.push(`N° chantier: ${info.site}`);
+    if(info.date)cols.push(`Date: ${new Date(info.date).toLocaleDateString('fr-FR')}`);
+    if(info.location)cols.push(`Lieu: ${info.location}`);
+    // 2 per row
+    for(let i=0;i<cols.length;i+=2){
+      doc.text(cols[i],margin,y);
+      if(cols[i+1])doc.text(cols[i+1],W/2,y);
+      y+=5.5;
+    }
+    y+=2;
+  }
+
+  // ── TOTAUX ──
+  doc.setFillColor(248,248,248);
+  doc.roundedRect(margin,y,W-margin*2,10,2,2,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(0,0,0);
+  doc.text(`TOTAL: ${savedData.length} element${savedData.length>1?'s':''}`,margin+3,y+6.5);
+  const nets=[...new Set(savedData.map(d=>d.network_type))];
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(100,100,100);
+  doc.text(`${nets.length} type${nets.length>1?'s':''} de reseau`,W-margin-3,y+6.5,{align:'right'});
+  y+=16;
+
+  // ── ITEMS PAR RESEAU ──
+  const grouped={};
+  savedData.forEach(it=>{const k=it.network_type||'Autre';if(!grouped[k])grouped[k]=[];grouped[k].push(it)});
+
+  const pageH=297;const bottomMargin=20;
+
+  Object.entries(grouped).forEach(([net,items])=>{
+    // Check page break for header
+    if(y>pageH-bottomMargin-20){doc.addPage();y=20}
+
+    // Network title band
+    doc.setFillColor(13,17,23);
+    doc.rect(margin,y,W-margin*2,7,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(240,165,0);
+    doc.text(net.toUpperCase(),margin+3,y+5);
+    doc.setTextColor(180,228,244);doc.setFont('helvetica','normal');doc.setFontSize(7.5);
+    doc.text(`${items.length} article${items.length>1?'s':''}`,W-margin-3,y+5,{align:'right'});
+    y+=9;
+
+    // Table header
+    doc.setFillColor(33,38,45);
+    doc.rect(margin,y,W-margin*2,5.5,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(139,148,158);
+    doc.text('DESIGNATION',margin+3,y+3.8);
+    doc.text('DIAM.',margin+100,y+3.8);
+    doc.text('QTE',margin+130,y+3.8);
+    doc.text('CHANTIER',margin+145,y+3.8);
+    y+=7;
+
+    items.forEach((it,idx)=>{
+      if(y>pageH-bottomMargin){doc.addPage();y=20}
+      // Alternating rows
+      if(idx%2===0){doc.setFillColor(22,27,34)}
+      else{doc.setFillColor(26,31,38)}
+      doc.rect(margin,y,W-margin*2,5.5,'F');
+
+      doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(230,237,243);
+      const nameStr=it.item_key.length>40?it.item_key.substring(0,38)+'...':it.item_key;
+      doc.text(nameStr,margin+3,y+3.8);
+
+      doc.setTextColor(240,165,0);doc.setFont('helvetica','bold');doc.setFontSize(7.5);
+      doc.text(String(it.diameter),margin+100,y+3.8);
+
+      doc.setTextColor(230,237,243);doc.setFont('helvetica','bold');doc.setFontSize(8);
+      doc.text(`x${it.quantity}`,margin+130,y+3.8);
+
+      if(it.project_name){
+        doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(139,148,158);
+        const proj=it.project_name.length>18?it.project_name.substring(0,16)+'...':it.project_name;
+        doc.text(proj,margin+145,y+3.8);
+      }
+      y+=5.5;
+    });
+    y+=6;
+  });
+
+  // ── FOOTER ──
+  const totalPages=doc.getNumberOfPages();
+  for(let i=1;i<=totalPages;i++){
+    doc.setPage(i);
+    doc.setFillColor(13,17,23);
+    doc.rect(0,287,W,10,'F');
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(139,148,158);
+    doc.text('Liste By Cisepz - Genie Climatique',margin,293);
+    doc.text(`Page ${i}/${totalPages}`,W-margin,293,{align:'right'});
+    doc.setTextColor(240,165,0);
+    doc.text('cisepz.fr',W/2,293,{align:'center'});
+  }
+
+  return doc;
+}
+
+function downloadPDF(){
+  if(!savedData.length){showToast('Liste vide','err');return}
+  try{
+    const doc=generatePDF();
+    const dateStr=new Date().toISOString().split('T')[0];
+    doc.save(`Liste_Materiel_CISEPZ_${dateStr}.pdf`);
+    showToast('PDF telecharge !');
+  }catch(e){console.error(e);showToast('Erreur PDF','err')}
+}
+
+// ===== EMAIL PDF MODAL =====
+function openEmailPDFModal(){
+  if(!savedData.length){showToast('Liste vide','err');return}
+  const info=getDeliveryInfo();
+  const dateStr=new Date().toLocaleDateString('fr-FR');
+  document.getElementById('email-subject').value=`Liste materiel CISEPZ - ${info.site||dateStr}`;
+  document.getElementById('email-recipient').value='';
+  document.getElementById('modal-email-pdf').classList.add('open');
+}
+function closeEmailModal(){document.getElementById('modal-email-pdf').classList.remove('open')}
+
+function sendPDFEmail(){
+  const recipient=document.getElementById('email-recipient').value.trim();
+  const subject=document.getElementById('email-subject').value.trim()||'Liste materiel CISEPZ';
+  const btn=document.getElementById('modal-send-btn');
+  const label=document.getElementById('modal-send-label');
+
+  label.innerHTML='<span class="spinner"></span>';
+  btn.disabled=true;
+
+  setTimeout(()=>{
+    try{
+      const doc=generatePDF();
+      const pdfBlob=doc.output('blob');
+      const pdfDataUri=doc.output('datauristring');
+      const dateStr=new Date().toISOString().split('T')[0];
+      const filename=`Liste_Materiel_CISEPZ_${dateStr}.pdf`;
+
+      // Download PDF first
+      const link=document.createElement('a');
+      link.href=pdfDataUri;
+      link.download=filename;
+      link.click();
+
+      // Build email body
+      const info=getDeliveryInfo();
+      let body='Veuillez trouver ci-joint la liste de materiel CISEPZ.\n\n';
+      if(info.companion)body+=`Compagnon: ${info.companion}\n`;
+      if(info.site)body+=`N° chantier: ${info.site}\n`;
+      if(info.date)body+=`Date livraison: ${new Date(info.date).toLocaleDateString('fr-FR')}\n`;
+      if(info.location)body+=`Lieu: ${info.location}\n`;
+      body+=`\nTotal: ${savedData.length} article${savedData.length>1?'s':''}\n`;
+      body+='\n-- Liste generee par Liste By Cisepz - Genie Climatique';
+
+      const mailto=`mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.open(mailto);
+
+      label.textContent='Envoyer';
+      btn.disabled=false;
+      closeEmailModal();
+      showToast('PDF telecharge + Email ouvert !');
+    }catch(e){
+      console.error(e);
+      label.textContent='Envoyer';
+      btn.disabled=false;
+      showToast('Erreur PDF','err');
+    }
+  },300);
+}
+
+// Close modal on overlay click
+document.getElementById('modal-email-pdf').addEventListener('click',function(e){
+  if(e.target===this)closeEmailModal();
+});
+
+// ===== TEXT PREVIEW / EMAIL / WHATSAPP =====
+let previewOpen=false;
+function togglePreview(){
+  previewOpen=!previewOpen;const box=document.getElementById('preview-box');
+  document.getElementById('preview-btn-text').textContent=previewOpen?"Masquer l'apercu":"Voir l'apercu texte";
+  if(previewOpen){document.getElementById('preview-text').textContent=generateText();box.style.display='block'}
+  else box.style.display='none';
+}
+function generateText(){
+  const info=getDeliveryInfo();
+  const grouped={};savedData.forEach(it=>{const k=it.network_type||'Autre';if(!grouped[k])grouped[k]=[];grouped[k].push(it)});
+  const now=new Date();
+  let t='LISTE MATERIEL - CISEPZ Genie Climatique\n'+'='.repeat(48)+'\n';
+  t+=`Date: ${now.toLocaleDateString('fr-FR')} a ${now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}\n`;
+  t+=`Total: ${savedData.length} element${savedData.length>1?'s':''}\n`;
+  if(info.companion||info.date||info.location||info.site){
+    t+='\nLIVRAISON:\n';
+    if(info.companion)t+=`  Compagnon: ${info.companion}\n`;
+    if(info.site)t+=`  N° chantier: ${info.site}\n`;
+    if(info.date)t+=`  Date: ${new Date(info.date).toLocaleDateString('fr-FR')}\n`;
+    if(info.location)t+=`  Lieu: ${info.location}\n`;
+  }
+  t+='\n'+'='.repeat(48)+'\n\n';
+  Object.entries(grouped).forEach(([net,items])=>{
+    t+=`-- ${net.toUpperCase()} --\n`;
+    items.forEach(it=>{t+=`  - ${it.item_key} / ${it.diameter} / x${it.quantity}${it.project_name?' ('+it.project_name+')':''}\n`});
+    t+='\n';
+  });
+  t+='Genere par Liste By Cisepz - Genie Climatique\n';
+  return t;
+}
+function copyText(){
+  navigator.clipboard.writeText(document.getElementById('preview-text').textContent).then(()=>showToast('Copie !')).catch(()=>showToast('Erreur copie','err'));
+}
+function sendEmail(){
+  if(!savedData.length){showToast('Liste vide','err');return}
+  const info=getDeliveryInfo();
+  const sub=`Liste materiel CISEPZ - ${info.site||new Date().toLocaleDateString('fr-FR')}`;
+  window.open(`mailto:?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(generateText())}`);
+  showToast('Email ouvert !');
+}
+function sendWhatsApp(){
+  if(!savedData.length){showToast('Liste vide','err');return}
+  window.open(`https://wa.me/?text=${encodeURIComponent(generateText())}`,'_blank');showToast('WhatsApp ouvert !');
+}
+
+// ===== TOAST =====
+let toastTimer;
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(type==='err'?'err':'ok');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ===== SERVICE WORKER =====
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+
+renderNetworks();updateBadge();
+</script>
+</body>
+</html>
