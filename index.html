@@ -322,32 +322,462 @@ select option{background:var(--surface2);color:var(--text)}
 <div class="toast" id="toast"></div>
 
 <script>
-const NETWORKS=[
-  {id:'cuivre',name:'Cuivre',icon:'🔴',desc:'Tubes & raccords cuivre'},
-  {id:'multicouche',name:'Multicouche',icon:'🔵',desc:'Tubes & raccords MC'},
-  {id:'per',name:'PER',icon:'🟠',desc:'Tubes & raccords PER'},
-  {id:'acier',name:'Acier',icon:'⚫',desc:'Tubes & raccords acier'},
-  {id:'inox',name:'Inox',icon:'✨',desc:'Tubes & raccords inox'},
-  {id:'pvc',name:'PVC / Évac.',icon:'⚪',desc:'Tubes & raccords PVC'},
-  {id:'collier_hilti',name:'Collier Hilti',icon:'🔗',desc:'Colliers & supports'},
-  {id:'gaine',name:'Gaines CVC',icon:'🟢',desc:'Gaines & accessoires'},
-  {id:'accessoires',name:'Accessoires',icon:'🔧',desc:'Fixations & boulonnerie'},
-  {id:'materiaux',name:'Matériaux',icon:'🧴',desc:'Adhésifs & consommables'},
-  {id:'isolation',name:'Isolation',icon:'🛡️',desc:'Supports & accessoires'}
+const NETWORKS = [
+  {id:'cuivre_frigo',    name:'Cuivre Frigo',       icon:'🔴', desc:'Liaisons frigo & raccords cuivre'},
+  {id:'gaines_cvc',     name:'Gaines CVC',          icon:'🟢', desc:'Gaines flexibles & spiralées'},
+  {id:'access_gaines',  name:'Accessoires Gaines',  icon:'⚙️', desc:'Coudes, tés, réductions, piquages'},
+  {id:'colliers_vmc',   name:'Colliers VMC',         icon:'🔗', desc:'Colliers gaines & ventilation'},
+  {id:'chemin_cables',  name:'Chemin de Câbles',     icon:'⬛', desc:'CDC, dalles P31, rails CSN'},
+  {id:'cables_elec',    name:'Câbles Électriques',   icon:'⚡', desc:'R2V, LIYCY blindé, IRL, ICTA'},
+  {id:'boites_elec',    name:'Boîtes & Connexions',  icon:'🔌', desc:'Plexo IP55, bornes WAGO'},
+  {id:'fixations_rails',name:'Fixations & Rails',    icon:'🔧', desc:'Rails, consoles, pieds, supports'},
+  {id:'chevilles',      name:'Chevilles & Vis béton',icon:'🪛', desc:'Chevilles, goujons, vis béton'},
+  {id:'vis_boulonnerie',name:'Vis & Boulonnerie',    icon:'🔩', desc:'Vis autoperceuses, colliers, écrous'},
+  {id:'outillage',      name:'Outillage',            icon:'🪚', desc:'Scies trépan, lames, forets'},
+  {id:'brasure',        name:'Brasure & Soudure',    icon:'🔥', desc:'Baguettes, décapants, agrafeuse'},
+  {id:'adhesifs_etancheite', name:'Adhésifs & Étanchéité', icon:'🧴', desc:'Rubans alu, mastics, silicone'},
+  {id:'pompes_relevage',name:'Pompes & Supports',    icon:'💧', desc:'Pompes de relevage, supports'},
+  {id:'consommables',   name:'Consommables',         icon:'📦', desc:'Films, peintures, nettoyants'},
 ];
-const MATERIALS={
-  cuivre:{'Tubes cuivre':[{name:'Tube cuivre écroui',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']},{name:'Tube cuivre recuit (couronne)',diameters:['10/12','12/14','14/16','16/18']},{name:'Couronne Tricoclair',diameters:['16x22','20x27']}],'Raccords a souder':[{name:'Coude 90',diameters:['12','14','16','18','22','28','35','42']},{name:'Coude 45',diameters:['12','14','16','18','22','28']},{name:'Te egal',diameters:['12','14','16','18','22','28','35','42']},{name:'Manchon',diameters:['12','14','16','18','22','28','35','42']},{name:'Reduction',diameters:['14/12','16/14','18/16','22/18','28/22','35/28','42/35']},{name:'Bouchon',diameters:['12','14','16','18','22','28']}],'Raccords laiton':[{name:'Raccord droit male',diameters:['12-3/8','14-1/2','16-1/2','18-3/4','22-3/4','28-1']},{name:'Raccord droit femelle',diameters:['12-3/8','14-1/2','16-1/2','18-3/4','22-3/4','28-1']},{name:'Coude male',diameters:['12-3/8','14-1/2','16-1/2','18-3/4','22-3/4']},{name:'Coude femelle',diameters:['12-3/8','14-1/2','16-1/2','18-3/4','22-3/4']}],'Vannes':[{name:"Vanne d'arret a souder",diameters:['12','14','16','18','22','28']},{name:"Robinet d'arret droit",diameters:['12','14','16','18','22']},{name:"Robinet d'arret equerre",diameters:['12','14']}],'Accessoires':[{name:'Collier isophonique',diameters:['12','14','16','18','22','28','35','42']},{name:'Rosace',diameters:['12','14','16','18','22','28']},{name:'Fourreau',diameters:['14','16','18','22','28']}]},
-  multicouche:{'Tubes multicouche':[{name:'Tube MC barre 5m',diameters:['16','20','26','32']},{name:'Tube MC couronne',diameters:['16','20','26']},{name:'Tube pre-gaine',diameters:['16','20','26']}],'Raccords a sertir':[{name:'Coude 90 a sertir',diameters:['16','20','26','32']},{name:'Coude 45 a sertir',diameters:['16','20','26']},{name:'Te egal a sertir',diameters:['16','20','26','32']},{name:'Manchon a sertir',diameters:['16','20','26','32']},{name:'Reduction a sertir',diameters:['20/16','26/20','32/26']},{name:'Bouchon a sertir',diameters:['16','20','26','32']}],'Raccords mixtes':[{name:'Raccord droit male',diameters:['16-1/2','20-1/2','20-3/4','26-3/4','26-1','32-1']},{name:'Raccord droit femelle',diameters:['16-1/2','20-1/2','20-3/4','26-3/4','26-1']},{name:'Coude male applique',diameters:['16-1/2','20-1/2']},{name:'Coude femelle applique',diameters:['16-1/2','20-1/2']}],'Collecteurs':[{name:'Collecteur 2 departs',diameters:['16','20']},{name:'Collecteur 4 departs',diameters:['16','20']},{name:"Vanne d'arret MC",diameters:['16','20','26','32']}]},
-  per:{'Tubes PER':[{name:'Tube PER nu couronne',diameters:['12','16','20','25']},{name:'Tube PER gaine',diameters:['12','16','20','25']},{name:'Tube PER BAO rouge',diameters:['12','16','20']},{name:'Tube PER BAO bleu',diameters:['12','16','20']}],'Raccords a glissement':[{name:'Coude 90',diameters:['12','16','20','25']},{name:'Te egal',diameters:['12','16','20','25']},{name:'Manchon',diameters:['12','16','20','25']},{name:'Raccord droit male',diameters:['12-3/8','16-1/2','20-3/4','25-1']},{name:'Raccord droit femelle',diameters:['12-3/8','16-1/2','20-3/4','25-1']}],'Collecteurs':[{name:'Collecteur plancher chauffant',diameters:['2 circuits','3 circuits','4 circuits','5 circuits','6 circuits','8 circuits','10 circuits','12 circuits']},{name:'Nourrice sanitaire',diameters:['2 departs','3 departs','4 departs','6 departs']},{name:'Platine PER',diameters:['12','16','20','25']}],'Accessoires PER':[{name:'Fix Ring Simple',diameters:['20/12 PER','25/16 PER']},{name:'Fix Ring Double',diameters:['20/12 PER','25/16 PER']}]},
-  acier:{'Tubes acier':[{name:'Tube acier noir barre 6m',diameters:['DN15','DN20','DN25','DN32','DN40','DN50','DN65','DN80','DN100']},{name:'Tube acier galvanise',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']}],'Raccords acier noir':[{name:'Coude 90 FM',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Coude 90 FF',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Te FF',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Mamelon',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Manchon FF',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Reduction MF',diameters:['DN20/15','DN25/20','DN32/25','DN40/32','DN50/40']},{name:'Bouchon',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']}],'Vannes acier':[{name:'Vanne papillon',diameters:['DN50','DN65','DN80','DN100','DN125','DN150','DN200']},{name:'Vanne a boisseau spherique',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Clapet anti-retour',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']}]},
-  inox:{'Tubes inox':[{name:'Tube inox 316L barre 6m',diameters:['DN15','DN20','DN25','DN32','DN40','DN50','DN65','DN80','DN100']},{name:'Tube inox 304',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']},{name:'Tube inox soude',diameters:['10','12','14','16','18','20','22','28']}],'Raccords inox':[{name:'Coude 90 inox',diameters:['12','14','16','18','22','28','35','42']},{name:'Coude 45 inox',diameters:['12','14','16','18','22','28']},{name:'Te egal inox',diameters:['12','14','16','18','22','28','35','42']},{name:'Manchon inox',diameters:['12','14','16','18','22','28','35','42']},{name:'Reduction inox',diameters:['14/12','16/14','18/16','22/18','28/22','35/28','42/35']},{name:'Bouchon inox',diameters:['12','14','16','18','22','28']}],'Vannes inox':[{name:"Vanne d'arret inox",diameters:['12','14','16','18','22','28']},{name:"Robinet d'arret inox droit",diameters:['12','14','16','18','22']},{name:'Vanne papillon inox',diameters:['DN50','DN65','DN80','DN100','DN125','DN150','DN200']},{name:'Clapet anti-retour inox',diameters:['DN15','DN20','DN25','DN32','DN40','DN50']}],'Accessoires inox':[{name:'Collier isophonique inox',diameters:['12','14','16','18','22','28','35','42']},{name:'Rosace inox',diameters:['12','14','16','18','22','28']},{name:'Supports fixations inox',diameters:['M8','M10','M12']}]},
-  pvc:{'Tubes PVC':[{name:'Tube PVC barre 4m',diameters:['32','40','50','63','75','80','100','125','160']},{name:'Tube PVC MF barre 4m',diameters:['40','50','100','125','160']}],'Raccords PVC':[{name:'Coude 87-30 MF',diameters:['32','40','50','63','80','100','125','160']},{name:'Coude 45 MF',diameters:['32','40','50','63','80','100','125','160']},{name:'Coude 67-30',diameters:['40','50','100']},{name:'Te 87-30',diameters:['32','40','50','63','80','100','125','160']},{name:'Culotte 45',diameters:['40','50','80','100','125','160']},{name:'Manchon FF',diameters:['32','40','50','63','80','100','125','160']},{name:'Reduction',diameters:['40/32','50/40','63/50','80/63','100/80','125/100','160/125']},{name:'Bouchon',diameters:['32','40','50','63','80','100','125','160']}],'Siphons':[{name:'Siphon lavabo',diameters:['32']},{name:'Siphon evier',diameters:['40']},{name:'Siphon de sol',diameters:['50','63']},{name:'Clapet anti-odeur',diameters:['32','40','50']}],'Fixations':[{name:'Collier a bride',diameters:['32','40','50','63','80','100','125','160']},{name:'Collier isophonique PVC',diameters:['32','40','50','80','100','125','160']}]},
-  collier_hilti:{'Colliers Styro':[{name:'Collier Styro cuivre',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']},{name:'Collier Styro acier',diameters:['DN15','DN20','DN25','DN32','DN40','DN50','DN65','DN80','DN100']},{name:'Collier Styro inox',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']}],'Colliers Armaflex':[{name:'Collier Armaflex cuivre',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']},{name:'Collier Armaflex acier',diameters:['DN15','DN20','DN25','DN32','DN40','DN50','DN65','DN80','DN100']},{name:'Collier Armaflex inox',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']}],'Colliers Isoles':[{name:'Collier isole cuivre',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']},{name:'Collier isole acier',diameters:['DN15','DN20','DN25','DN32','DN40','DN50','DN65','DN80','DN100']},{name:'Collier isole inox',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']}],'Colliers Nus':[{name:'Collier nu cuivre',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']},{name:'Collier nu acier',diameters:['DN15','DN20','DN25','DN32','DN40','DN50','DN65','DN80','DN100']},{name:'Collier nu inox',diameters:['10/12','12/14','14/16','16/18','18/20','20/22','26/28','32/35','40/42']}]},
-  gaine:{'Gaines circulaires':[{name:'Gaine galva spiralee',diameters:['80','100','125','160','200','250','315','400','500','630']},{name:'Gaine flexible alu',diameters:['80','100','125','160','200','250','315']},{name:'Gaine isolee',diameters:['80','100','125','160','200','250','315']}],'Raccords gaines':[{name:'Coude 90',diameters:['80','100','125','160','200','250','315','400']},{name:'Coude 45',diameters:['80','100','125','160','200','250','315']},{name:'Te 90',diameters:['100','125','160','200','250','315']},{name:'Reduction concentrique',diameters:['125/100','160/125','200/160','250/200','315/250','400/315']},{name:'Manchon de raccordement',diameters:['80','100','125','160','200','250','315']}],'Diffusion':[{name:"Bouche d'extraction",diameters:['80','100','125','160']},{name:"Bouche d'insufflation",diameters:['100','125','160','200']},{name:'Grille de reprise',diameters:['200x200','300x200','400x200','500x300']},{name:'Registre de reglage',diameters:['100','125','160','200','250','315']}],'Accessoires CVC':[{name:'Collier de suspension',diameters:['80','100','125','160','200','250','315','400']},{name:'Ruban alu',diameters:['standard']},{name:'Mastic aeraulique',diameters:['standard']},{name:'Manchette souple',diameters:['100','125','160','200','250','315']}]},
-  accessoires:{'Colliers Fixations':[{name:'Collier nylon 4.7mm',diameters:['285mm','300mm']},{name:'Collier nylon 3.6mm',diameters:['200mm','300mm']},{name:'Collier Serflex',diameters:['12-22','16-27','20-32','25-40']},{name:'Collier Strong7 Simple',diameters:['12','16','18','22','28','32','40']},{name:'Collier Strong7 Double',diameters:['12','14','16','18','22']},{name:'Bande perforee AG',diameters:['25mm x 25m']}],'Chevilles':[{name:'Cheville Driva vis 12x35',diameters:['standard']},{name:'Cheville placo metal vis',diameters:['standard']},{name:'Cheville a frapper 8x40',diameters:['standard']},{name:'Cheville JET 6x40',diameters:['standard']},{name:'Cheville Grippon Blanc 6',diameters:['sachet 100']},{name:'Cheville Grippon Bleu 8',diameters:['sachet 100']},{name:'Cheville Grippon Marron 8',diameters:['sachet 100']},{name:'Cheville Aggrip Grise 10',diameters:['sachet']},{name:'Cheville Molly MV2 8x53',diameters:['standard']},{name:'Cheville MEX 4x32',diameters:['avec vis','sans vis']},{name:'Cheville MEX 6x37',diameters:['avec vis','sans vis']},{name:'Cheville MEX 6x52',diameters:['avec vis','sans vis']},{name:'Cheville femelle Hilti 8/25',diameters:['standard']},{name:'Goujon AZ 8',diameters:['x75','x90','x115']},{name:'Goujon AZ 10x90',diameters:['standard']}],'Hilti embase de 8':[{name:'Hilti embase de 8',diameters:['x40','x50','x65','x75','x90','x110','x120','x150']}],'Vis Boulonnerie':[{name:'Vis placo TT PH AP 3.5',diameters:['x25','x35']},{name:'Vis autoperceuse HEX AZ 4.2',diameters:['x16','x25']},{name:'Vis autoperceuse 6.3x38',diameters:['standard']},{name:'Tige filetee AZ',diameters:['8','10']},{name:'Ecrou 6 pans AZ 8',diameters:['standard']},{name:'Rondelle plate XL AZ 8',diameters:['standard']}],'Rails Profiles':[{name:'Profil RP2 41x21',diameters:['LG3m']},{name:'Profil RP4 41x41',diameters:['LG3m']},{name:'Rail 41x21',diameters:['LG3m','LG6m']},{name:'Rail 41x41',diameters:['LG3m','LG6m']},{name:'Ecrou rail ERP M8',diameters:['x30','x50']},{name:'Ecrou rail ERP M10',diameters:['x40','x50']}]},
-  materiaux:{"Produits Etancheite":[{name:'Mastic sanitaire',diameters:['blanc','translucide']},{name:'Mastic polyurethane Gepur',diameters:['gris 310ml']},{name:'Pate etancheite Filapat',diameters:['400g']},{name:'Silicone neutre Gesil',diameters:['gris 300ml']},{name:'Ruban Teflon',diameters:['12mm x 12m']},{name:'Teflon fil dentaire',diameters:['standard']}],'Adhesifs':[{name:'Adhesif emballage havane',diameters:['100x50mm']},{name:'Adhesif isolation alu',diameters:['50x50mm']},{name:'Adhesif multi-usage Orange',diameters:['33x50mm']},{name:'Bande adhesive Armaflex',diameters:['15m x 50mm']},{name:'Scotch electricien',diameters:['standard']},{name:'Colle PVC 1L',diameters:['standard']},{name:'Decapant PVC',diameters:['standard']}],'Lubrifiants':[{name:'Degrippant Gefix',diameters:['400ml']},{name:"Huile de coupe Conexy",diameters:['500ml']},{name:'Detecteur fuites Conexy',diameters:['400ml']},{name:'Mousse expansive Gemous',diameters:['500ml']}],'Brasure Soudure':[{name:'Baguette brasure Phosbraz',diameters:['2 5kg']},{name:'Baguette brasure 6% argent PAG60',diameters:['1kg']},{name:'Baguette brasure Cobrox',diameters:['3 5kg']},{name:'Brasure 30% argent nue',diameters:['1kg']}],'Consommables':[{name:'Poupee filasse',diameters:['250g']},{name:'Sacs poubelle 110L',diameters:['lot 20']},{name:'Gants latex EN455',diameters:['boite 100']},{name:'Chiffons blanc coton',diameters:['10kg']},{name:'Chiffon couleur',diameters:['standard']},{name:'Chiffon blanc',diameters:['standard']}]},
-  isolation:{'Supports Anti-Vibrations':[{name:'Silent bloc compression 40 M/M8',diameters:['standard']},{name:'Set 4 plots anti-vibrations ATC 40',diameters:['M/M8']}],'Accessoires Tuyauterie':[{name:'Embase a frapper',diameters:['8x40']},{name:'Embase a visser collier nylon',diameters:['6/9']},{name:'Rallonge PAV',diameters:['7x20','7x30','7x40']},{name:'Rosace plate',diameters:['25']},{name:'Rosace conique',diameters:['HT9','HT14','HT19']}],'Boitiers Electriques':[{name:'Boite derivation 80x80x40 IP55',diameters:['etanche']}]}
-};
+const MATERIALS = {
+
+  cuivre_frigo: {
+    'Liaisons frigo isolées doubles': [
+      {name:'Liaison frigo double M1 1/4-3/8 iso.8mm', diameters:['L20m','L50m']},
+      {name:'Liaison frigo double M1 1/4-1/2 iso.8mm', diameters:['L20m']},
+      {name:'Liaison frigo double M1 1/4-1/2 iso.10mm', diameters:['L50m']},
+      {name:'Liaison frigo double M1 1/4-3/8 iso.10mm', diameters:['L50m']},
+      {name:'Liaison frigo double M1 3/8-5/8 iso.10mm', diameters:['L20m']},
+    ],
+    'Liaisons frigo isolées simples': [
+      {name:'Liaison frigo simple M1 1/4 iso.10mm', diameters:['L30m','L50m']},
+      {name:'Liaison frigo simple M1 3/8 iso.10mm', diameters:['L30m','L50m']},
+      {name:'Liaison frigo simple M1 1/2 iso.10mm', diameters:['L30m','L50m']},
+      {name:'Liaison frigo simple M1 3/4 iso.10mm', diameters:['L20m']},
+      {name:'Liaison frigo simple M1 5/8 iso.10mm', diameters:['L30m','L50m']},
+      {name:'Liaison frigo simple M1 7/8 iso.10mm', diameters:['L20m']},
+    ],
+    'Barres de cuivre NF L4m ep.1mm': [
+      {name:'Barre cuivre NF L4m ep.1mm', diameters:['1/2','5/8','3/4','7/8','1"','1"1/8']},
+    ],
+    'Coudes cuivre FF 45': [
+      {name:'Coude cuivre FF 45', diameters:['1/4','3/8','1/2','5/8','3/4','7/8','1"','1"1/8']},
+    ],
+    'Coudes cuivre FF 90 grand rayon': [
+      {name:'Coude cuivre FF 90 grand rayon', diameters:['1/4','3/8','1/2','5/8','3/4','7/8','1"','1"1/8']},
+    ],
+    'Tes cuivre FF egaux': [
+      {name:'Te cuivre FF egal', diameters:['1/4','3/8','1/2','5/8','3/4','7/8','1"1/8']},
+    ],
+    'Tes cuivre FFF inegaux': [
+      {name:'Te cuivre FFF 3/8-3/8-1/4', diameters:['standard']},
+      {name:'Te cuivre FFF 3/8-3/8-1/2', diameters:['standard']},
+      {name:'Te cuivre FFF 3/8-3/8-5/8', diameters:['standard']},
+      {name:'Te cuivre FFF 1/2-3/8-1/2', diameters:['standard']},
+      {name:'Te cuivre FFF 1/2-1/2-1/4', diameters:['standard']},
+      {name:'Te cuivre FFF 1/2-1/2-3/8', diameters:['standard']},
+      {name:'Te cuivre FFF 5/8-3/8-1/2', diameters:['standard']},
+      {name:'Te cuivre FFF 5/8-1/2-5/8', diameters:['standard']},
+      {name:'Te cuivre FFF 5/8-5/8-1/2', diameters:['standard']},
+      {name:'Te cuivre FFF 5/8-5/8-3/4', diameters:['standard']},
+      {name:'Te cuivre FFF 5/8-5/8-7/8', diameters:['standard']},
+      {name:'Te cuivre FFF 5/8-5/8-1"1/8', diameters:['standard']},
+      {name:'Te cuivre FFF 7/8-5/8-5/8', diameters:['standard']},
+      {name:'Te cuivre FFF 7/8-7/8-5/8', diameters:['standard']},
+      {name:'Te cuivre FFF 7/8-7/8-1"1/8', diameters:['standard']},
+    ],
+    'Manchons cuivre FF': [
+      {name:'Manchon cuivre FF', diameters:['1/4','3/8','1/2','5/8','3/4','7/8','1"','1"1/8']},
+    ],
+    'Reductions cuivre FF': [
+      {name:'Reduction cuivre FF', diameters:['3/8-1/4','1/2-3/8','5/8-3/8','5/8-1/2','3/4-3/8','3/4-1/2','3/4-5/8','7/8-3/4','1"1/8-3/4']},
+    ],
+  },
+
+  gaines_cvc: {
+    'Gaines flexibles nues M0 Aluflex L10ml': [
+      {name:'Aluflex nu M0 L10ml', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Gaines flexibles isolees M0/M1 Sonoflex L10ml': [
+      {name:'Sonoflex isolee M0/M1 L10ml', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Gaines semi-rigides galva Meflex L3ml': [
+      {name:'Meflex semi-rigide galva L3ml', diameters:['80','100','125','160','200','250','315','355','400','450','500']},
+    ],
+    'Gaines semi-rigides alu Semiflex L3ml': [
+      {name:'Semiflex semi-rigide alu L3ml', diameters:['80','100','125','160','200','250','315','355','400','450','500','630']},
+    ],
+    'Conduits vinyl PVCflex L6ml': [
+      {name:'PVCflex nu L6ml', diameters:['80','125','160']},
+      {name:'PVCflex isole L6ml', diameters:['80','125','160']},
+    ],
+    'Gaines circulaires spiralees GS galva': [
+      {name:'Gaine spiralee GS galva L2470', diameters:['80','125','160','200','250','315','355','400','450','500','560','630']},
+      {name:'Gaine spiralee GS galva L3000', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+  },
+
+  access_gaines: {
+    'Coudes 45 galva': [
+      {name:'Coude 45 galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Coudes 90 galva': [
+      {name:'Coude 90 galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Tes egaux galva': [
+      {name:'Te egal galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Reductions coniques galva': [
+      {name:'Reduction conique galva', diameters:['160/125','200/125','200/160','250/125','250/160','250/200','315/125','315/160','315/200','315/250','355/200','355/250','355/315','400/200','400/250','400/315','400/355','450/315','450/355','450/400','500/315','500/400','500/450','560/450','560/500','630/500','630/560']},
+    ],
+    'Piquages sur gaine PEC galva': [
+      {name:'Piquage sur gaine PEC galva', diameters:['80/80','80/100','80/125','100/100','100/125','125/125','125/160','125/200','125/250','125/315','160/160','160/200','160/250','160/315','200/200','200/250','200/315','250/250','250/315','315/315','315/355','315/400','355/355','355/400','400/400','400/450','450/450','450/500']},
+    ],
+    'Piquages plats PEP galva': [
+      {name:'Piquage plat PEP galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Raccords flexibles RF galva': [
+      {name:'Raccord flexible RF galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Manchons RM galva': [
+      {name:'Manchon raccordement RM galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Registres circulaires RPL galva': [
+      {name:'Registre circulaire RPL galva', diameters:['125','160','200','250','315','355','400','450','500']},
+    ],
+    'Silencieux SAR galva': [
+      {name:'Silencieux SAR galva L600', diameters:['125','160','200','250','315','355','400']},
+      {name:'Silencieux SAR galva L900', diameters:['450','500']},
+    ],
+    'Manchettes souples DAD galva': [
+      {name:'Manchette souple DAD galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Bagues de jonction BG galva': [
+      {name:'Bague jonction BG galva', diameters:['125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Brides BP / BPP galva': [
+      {name:'Bride plate BP galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+      {name:'Bride a patte BPP galva', diameters:['100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Supports SG / Colliers centrage CCG': [
+      {name:'Support galva SG', diameters:['125','160','200','250','315','355','400','450','500','560','630']},
+      {name:'Collier centrage CCG galva', diameters:['200','315','355','400','450','500','560','630']},
+    ],
+    'Fourreaux de traversee FT galva L750': [
+      {name:'Fourreau traversee FT galva L750', diameters:['125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+  },
+
+  colliers_vmc: {
+    'Colliers serrage gaine souple inox MCA': [
+      {name:'Collier serrage MCA inox 430', diameters:['60-110mm','60-165mm','60-325mm']},
+    ],
+    'Colliers serrage Monofil galva': [
+      {name:'Collier Monofil galva', diameters:['O80','O100','O125','O160','O200','O250','O315','O355','O400','O560','O630']},
+    ],
+    'Colliers ventilation OBMC SX413 galva': [
+      {name:'Collier ventilation OBMC SX413 galva', diameters:['O100','O125','O160','O200','O250','O315','O355','O400','O450','O500','O560','O630']},
+    ],
+  },
+
+  chemin_cables: {
+    'Chemins de cables fil BS 3M': [
+      {name:'CF 30 fil BS 3M', diameters:['100','150','200','300']},
+      {name:'CF 54 fil BS 3M', diameters:['150','200','300','400']},
+    ],
+    'Couvercles fil CP 2M': [
+      {name:'Couvercle fil CP 2M', diameters:['100','150','200','300','400']},
+    ],
+    'Clip F02': [
+      {name:'Clip F02', diameters:['standard']},
+    ],
+    'Dalles P31 auto 3M': [
+      {name:'Dalle P31 M/F 50x auto 3M', diameters:['100','150','200']},
+      {name:'Dalle P31 embouti M/F 50x200 auto 3M', diameters:['standard']},
+    ],
+    'Eclisses P31': [
+      {name:'Eclisse universelle EDU H50', diameters:['standard']},
+      {name:'Eclisse CE40', diameters:['standard']},
+    ],
+    'Rails & Couvercles P31': [
+      {name:'Rail 41x41-2.5 S 3000', diameters:['standard']},
+      {name:'Rail CSN 3000', diameters:['standard']},
+      {name:'Couvercle CO L3M', diameters:['100','150','200']},
+    ],
+    'Consoles CL': [
+      {name:'Console CL', diameters:['150','200','300','350']},
+    ],
+  },
+
+  cables_elec: {
+    'Cables R2V cuivre L50m': [
+      {name:'R2V CU 3G L50m', diameters:['1.5','2.5','4']},
+      {name:'R2V CU 4G L50m', diameters:['1.5','2.5']},
+      {name:'R2V CU 5G L50m', diameters:['1.5']},
+    ],
+    'Cables blindes LIYCY': [
+      {name:'LIYCY 2x0,75 blinde C L100m', diameters:['standard']},
+      {name:'LIYCY 2x0,75 blinde T L500m', diameters:['standard']},
+      {name:'LIYCY 2x1,5 blinde T5 L500m', diameters:['standard']},
+    ],
+    'Tubes IRL au metre': [
+      {name:'IRL 3321 C+ tube au metre', diameters:['D16','D20','D25']},
+    ],
+    'Tubes ICTA au metre': [
+      {name:'ICTA 3422 C+ ATF Classic+ au metre', diameters:['D16','D20']},
+    ],
+    'Colliers cables': [
+      {name:'Collier Origin nylon', diameters:['292x3.6 BLC','292x3.6 NR']},
+    ],
+  },
+
+  boites_elec: {
+    'Boites Plexo IP55': [
+      {name:'Boite Optibox IP55', diameters:['80x80x42','100x100x52']},
+    ],
+    'Bornes WAGO 221 GREEN': [
+      {name:'Borne WAGO 221 2x4mm2 leviers', diameters:['centaine']},
+      {name:'Borne WAGO 221 3x4mm2 leviers', diameters:['centaine']},
+    ],
+    'Mini bornes WAGO a levier': [
+      {name:'Mini borne WAGO 2E', diameters:['centaine']},
+      {name:'Mini borne WAGO 3E', diameters:['centaine']},
+      {name:'Mini borne WAGO 4E', diameters:['centaine']},
+      {name:'Mini borne WAGO 5E', diameters:['centaine']},
+      {name:'Mini borne WAGO 8E', diameters:['centaine']},
+    ],
+  },
+
+  fixations_rails: {
+    'Rails & Profiles': [
+      {name:'Profil RP2 41x21 ep.2mm LG3m', diameters:['standard']},
+      {name:'Profil RP4 41x41 ep.2mm LG3m', diameters:['standard']},
+      {name:'Rail 41x21', diameters:['LG3m','LG6m']},
+      {name:'Rail 41x41', diameters:['LG3m','LG6m']},
+    ],
+    'Ecrous rail premonte ERP': [
+      {name:'Ecrou rail premonte ERP M8', diameters:['x30','x50']},
+      {name:'Ecrou rail premonte ERP M10', diameters:['x40','x50']},
+    ],
+    'Consoles KP4 41x41': [
+      {name:'Console KP4 41x41', diameters:['LG600mm','LG750mm']},
+    ],
+    'Consoles U plafond serie W H170': [
+      {name:'Console U plafond serie W H170', diameters:['LG100','LG150','LG200','LG300','LG400','LG500']},
+    ],
+    'Equerre & Bouchons': [
+      {name:'Equerre 41x41 4 trous 86x102mm', diameters:['standard']},
+      {name:'Bouchon extremite 41x21 BP2 noir', diameters:['centaine']},
+      {name:'Bouchon extremite 41x41 BP4 noir', diameters:['centaine']},
+    ],
+    'Tete bascule & Verrou': [
+      {name:'Tete bascule O8', diameters:['centaine']},
+      {name:'Verrou Fastlok N2 50kg', diameters:['centaine']},
+    ],
+    'Supports Rubbas': [
+      {name:'Support Rubbas', diameters:['400mm','600mm']},
+    ],
+    'Pieds Rubber caoutchouc': [
+      {name:'Mini pied Rubber 250x130x50mm', diameters:['standard']},
+      {name:'Pied Rubber 450x180x95mm', diameters:['standard']},
+      {name:'Pied Rubber 600x180x95mm', diameters:['standard']},
+      {name:'Pied Rubber 1000x180x95mm', diameters:['standard']},
+    ],
+    'Supports sol & Pieds carres': [
+      {name:'Support carre Rubleg 350x350mm', diameters:['standard']},
+      {name:'Kit support clim laque beige S-263P 550x400mm 160kg', diameters:['standard']},
+    ],
+    'Bande perforee AG': [
+      {name:'Bande perforee AG', diameters:['17mmx25m','25mmx25m']},
+    ],
+    'Patte a vis': [
+      {name:'Patte a vis metaux O6x40 M7x150', diameters:['centaine']},
+    ],
+  },
+
+  chevilles: {
+    'Chevilles Grippon': [
+      {name:'Cheville Grippon Blanc O6 sachet 100', diameters:['standard']},
+      {name:'Cheville Grippon Marron O8 sachet 100', diameters:['standard']},
+    ],
+    'Chevilles Aggrip': [
+      {name:'Cheville Aggrip Grise O10 sachet', diameters:['standard']},
+    ],
+    'Chevilles MEX': [
+      {name:'Cheville MEX O6x52/58', diameters:['avec vis','sans vis']},
+    ],
+    'Chevilles placo': [
+      {name:'Cheville placo metal + vis O12x35', diameters:['standard']},
+    ],
+    'Chevilles suspente': [
+      {name:'Cheville suspente Rapid O8x30', diameters:['centaine']},
+    ],
+    'Goujons ancrage premonte AZ': [
+      {name:'Goujon ancrage premonte AZ O8', diameters:['x75','x90','x115']},
+      {name:'Goujon ancrage premonte AZ O10x90', diameters:['centaine']},
+    ],
+    'Vis beton': [
+      {name:'Vis beton tete femelle AG M8x35', diameters:['centaine']},
+      {name:'Vis beton tete male AG M8x35', diameters:['centaine']},
+      {name:'Vis beton TT M8/M10 D6x35 boite 50', diameters:['standard']},
+      {name:'Piton femelle beton zingue GETO M8/10 D6mmx35mm boite 50', diameters:['standard']},
+    ],
+  },
+
+  vis_boulonnerie: {
+    'Vis autoperceuses': [
+      {name:'Vis autoperceuse T.HEX AZ O4.2x16', diameters:['centaine']},
+      {name:'Vis autoperceuse T.Bombee AZ carre O4.2x16', diameters:['centaine']},
+      {name:'Vis autoperceuse Hilti S-MS01Z 4,8x20', diameters:['millier']},
+    ],
+    'Vis a oeil': [
+      {name:'Vis a oeil AZ M8x25', diameters:['centaine']},
+    ],
+    'Ecrous & Rondelles': [
+      {name:'Ecrou 6 pans AZ O8', diameters:['centaine']},
+    ],
+    'Colliers sans fin Serflex': [
+      {name:'Collier sans fin AZ', diameters:['O10-16','O12-22','O16-27','O20-32','O25-40']},
+    ],
+    'Colliers Tubafix': [
+      {name:'Collier Tubafix O8-32mm', diameters:['centaine']},
+    ],
+    'Pince de serrage VMC': [
+      {name:'Pince de serrage pour cadre VMC', diameters:['centaine']},
+    ],
+  },
+
+  outillage: {
+    'Scies trepan T3 Kopram': [
+      {name:'Scie trepan T3 12L 19mm', diameters:['standard']},
+      {name:'Scie trepan T3 14L 22mm', diameters:['standard']},
+      {name:'Scie trepan T3 16L 25mm', diameters:['standard']},
+      {name:'Scie trepan T3 18L 29mm', diameters:['standard']},
+      {name:'Scie trepan T3 19L 30mm', diameters:['standard']},
+      {name:'Scie trepan T3 20L 32mm', diameters:['standard']},
+      {name:'Scie trepan T3 22L 35mm', diameters:['standard']},
+      {name:'Scie trepan T3 24L 38mm', diameters:['standard']},
+      {name:'Scie trepan T3 26L 41mm', diameters:['standard']},
+      {name:'Scie trepan T3 28L 44mm', diameters:['standard']},
+      {name:'Scie trepan T3 30L 48mm', diameters:['standard']},
+      {name:'Scie trepan T3 32L 51mm', diameters:['standard']},
+      {name:'Scie trepan T3 34L 54mm', diameters:['standard']},
+      {name:'Scie trepan T3 36L 57mm', diameters:['standard']},
+      {name:'Scie trepan T3 38L 60mm', diameters:['standard']},
+      {name:'Scie trepan T3 40L 64mm', diameters:['standard']},
+      {name:'Scie trepan T3 41L 65mm', diameters:['standard']},
+      {name:'Scie trepan T3 42L 67mm', diameters:['standard']},
+      {name:'Scie trepan T3 43L 68mm', diameters:['standard']},
+      {name:'Scie trepan T3 44L 70mm', diameters:['standard']},
+      {name:'Scie trepan T3 48L 76mm', diameters:['standard']},
+      {name:'Scie trepan T3 52L 83mm', diameters:['standard']},
+      {name:'Scie trepan T3 54L 86mm', diameters:['standard']},
+      {name:'Scie trepan T3 64L 102mm', diameters:['standard']},
+      {name:'Scie trepan T3 66L 105mm', diameters:['standard']},
+      {name:'Scie trepan T3 70L 111mm', diameters:['standard']},
+      {name:'Scie trepan T3 80L 127mm', diameters:['standard']},
+      {name:'Scie trepan T3 96L 152mm', diameters:['standard']},
+    ],
+    'Trepans bimetal ERKO': [
+      {name:'Trepan bimetal ERKO', diameters:['D160mm','D210mm']},
+    ],
+    'Arbres pour trepan': [
+      {name:'Arbre pour trepan 14-30mm', diameters:['standard']},
+      {name:'Arbre pour trepan 32-210mm', diameters:['standard']},
+    ],
+    'Forets': [
+      {name:'Foret pilote carbure EZC 47012', diameters:['standard']},
+    ],
+    'Lames scie sabre Milwaukee Torch Ice Edge x5': [
+      {name:'Lame scie sabre Torch Ice Edge (x5)', diameters:['150mm','230mm']},
+    ],
+    'Disques a tronconner': [
+      {name:'Disque tronconner metaux IMA Evolution', diameters:['O125x1.6']},
+    ],
+  },
+
+  brasure: {
+    'Baguettes de brasure': [
+      {name:'Baguette brasure Phosbraz O2', diameters:['5kg']},
+      {name:'Baguette brasure 6% argent PAG60', diameters:['1kg']},
+      {name:'Baguette brasure cuivre enrobee Cobrox O3', diameters:['5kg']},
+    ],
+    'Decapant': [
+      {name:'Decapant poudre Castolin 800', diameters:['200g']},
+    ],
+    'Accessoires brasure': [
+      {name:'Agrafeuse Bostich T6-8OC2 tete moustache', diameters:['standard']},
+      {name:'Manchon Kaiflex ST O28 ep.019', diameters:['ml']},
+      {name:'Spatule de marouflage', diameters:['standard']},
+    ],
+  },
+
+  adhesifs_etancheite: {
+    'Rubans adhesifs': [
+      {name:'Ruban adhesif alu-butyl ASB M1 15ml L50mm', diameters:['RL']},
+      {name:'Ruban adhesif PE-butyl PSB 15ml L50mm', diameters:['RL']},
+      {name:'Adhesif isolation alu ECAP 50x50mm 30 microns', diameters:['standard']},
+      {name:'Adhesif isolation alu ECAP 50x100mm 40 microns', diameters:['standard']},
+      {name:'Adhesif gris toile 33x100mm', diameters:['standard']},
+      {name:'Bande adhesive Armaflex isolante 15mx50mm', diameters:['standard']},
+      {name:'Bande etancheite butyle Trackbande 10mx75mm', diameters:['standard']},
+      {name:'Bande isolante traversee de mur ep.3mm 25mx330mm', diameters:['standard']},
+    ],
+    'Mastics': [
+      {name:'Mastic acrylique M1 Eocryl B pot 6kg', diameters:['standard']},
+      {name:'Mastic acrylique M1 Eocryl W cartouche 280ml', diameters:['standard']},
+      {name:'Mastic acrylique M1 VMCacryl', diameters:['standard']},
+      {name:'Mastic polyurethane HM Gepur gris', diameters:['standard']},
+      {name:'Silicone neutre oxime gris Gesil 300ml', diameters:['standard']},
+    ],
+    'Griffes serre-cadre': [
+      {name:'Griffe rapide serre-cadre acier galvanise SKC boite 200', diameters:['standard']},
+    ],
+    'Pinceaux': [
+      {name:'Pinceau 40mm manche bois', diameters:['standard']},
+      {name:'Pinceau queue de morue 36mm', diameters:['standard']},
+    ],
+  },
+
+  pompes_relevage: {
+    'Pompes de relevage': [
+      {name:'Pompe bi-bloc Si-20', diameters:['standard']},
+      {name:'Pompe bi-bloc Si-30', diameters:['standard']},
+      {name:'Pompe bi-blocs SI-33 30L/H piston oscillant', diameters:['standard']},
+      {name:'Pompe relevage Delta pack 80x60 blanc RAL9003', diameters:['standard']},
+      {name:'Pompe relevage piston oscillant detection integree 20l/h', diameters:['standard']},
+    ],
+    'Supports muraux pompes': [
+      {name:'Support mural barre et niveau 70kg/bras', diameters:['465x375x800mm','550x375x800mm']},
+    ],
+    'Supports sol groupes exterieurs': [
+      {name:'Support sol ALTECH 280kg lot 2', diameters:['L450mm']},
+      {name:'Support sol ALTECH 450kg lot 2', diameters:['L600mm']},
+      {name:'Support sol caoutchouc SUMO 1000mm', diameters:['standard']},
+    ],
+    'Inter-sectionneurs Isolator': [
+      {name:'Inter-sectionneur Isolator 3P', diameters:['20A','32A','40A']},
+      {name:'Inter-sectionneur Isolator 4P', diameters:['20A','32A','40A']},
+    ],
+  },
+
+  consommables: {
+    'Films polyethylene': [
+      {name:'Film polyethylene PF T150 75m2 largeur 3m', diameters:['standard']},
+      {name:'Film polyethylene PF T150 165m2 largeur 3m', diameters:['standard']},
+    ],
+    'Peinture antirouille': [
+      {name:'Peinture antirouille rouge AR606 RAL3000 5L', diameters:['standard']},
+    ],
+    'Mousses & Nettoyants': [
+      {name:'Mousse nettoyante multisurface 500ml', diameters:['standard']},
+    ],
+    'Divers chantier': [
+      {name:'Traceur chantier fluo orange Soppec', diameters:['standard']},
+    ],
+  },
+
+};;
 
 let savedData=JSON.parse(localStorage.getItem('cisepz_list_v2')||'[]');
 let selectedItems={};
