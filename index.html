@@ -324,6 +324,10 @@ select option{background:var(--surface2);color:var(--text)}
 <script>
 const NETWORKS = [
   {id:'cuivre_frigo',    name:'Cuivre Frigo',       icon:'🔴', desc:'Liaisons frigo & raccords cuivre'},
+  {id:'cuivre_tube',     name:'Cuivre Tube',         icon:'🟤', desc:'Tubes cuivre écroui barre 5m'},
+  {id:'per',             name:'PER',                 icon:'🟠', desc:'Tubes PER prégainé bleu & rouge'},
+  {id:'multicouche',     name:'Multicouche',         icon:'🔵', desc:'Tubes & raccords Fluxo à sertir'},
+  {id:'pvc_gros',        name:'PVC Gros Diam.',      icon:'⚪', desc:'Raccords PVC Ø125 à 315mm'},
   {id:'gaines_cvc',     name:'Gaines CVC',          icon:'🟢', desc:'Gaines flexibles & spiralées'},
   {id:'access_gaines',  name:'Accessoires Gaines',  icon:'⚙️', desc:'Coudes, tés, réductions, piquages'},
   {id:'colliers_vmc',   name:'Colliers VMC',         icon:'🔗', desc:'Colliers gaines & ventilation'},
@@ -338,6 +342,11 @@ const NETWORKS = [
   {id:'adhesifs_etancheite', name:'Adhésifs & Étanchéité', icon:'🧴', desc:'Rubans alu, mastics, silicone'},
   {id:'pompes_relevage',name:'Pompes & Supports',    icon:'💧', desc:'Pompes de relevage, supports'},
   {id:'consommables',   name:'Consommables',         icon:'📦', desc:'Films, peintures, nettoyants'},
+  {id:'inox_sertir',    name:'Inox à Sertir',        icon:'⭕', desc:'Tubes & raccords inox 304L/316L à sertir'},
+  {id:'pvc_evac',       name:'PVC Évacuation Ø32-110',icon:'🟣', desc:'Coudes, culottes, tés, manchons PVC petit diamètre'},
+  {id:'robinetterie',   name:'Robinetterie & Vannes', icon:'🟡', desc:'Vannes boisseau, sphère, papillon, TA, purgeurs'},
+  {id:'sanitaire',      name:'Sanitaire',            icon:'🚽', desc:'Kits WC suspendu, collecteurs, platines Robifix'},
+  {id:'chauffe_eau',    name:'Chauffe-eau ECS',      icon:'♨️', desc:'Chauffe-eau électriques Thermor'},
 ];
 const MATERIALS = {
 
@@ -393,6 +402,263 @@ const MATERIALS = {
       {name:'Reduction cuivre FF', diameters:['3/8-1/4','1/2-3/8','5/8-3/8','5/8-1/2','3/4-3/8','3/4-1/2','3/4-5/8','7/8-3/4','1"1/8-3/4']},
     ],
   },
+
+  cuivre_tube: {
+    'Tubes cuivre ecroui demi-dur barre 5m': [
+      {name:'Tube cuivre ecroui demi-dur barre 5m', diameters:['10x12','12x14','14x16','16x18','20x22','26x28','33x35','38x40']},
+    ],
+  },
+
+  per: {
+    'Tubes PER pregaine BLEU couronne': [
+      {name:'Tube PER pregaine bleu couronne 50m', diameters:['12','16','20','25']},
+      {name:'Tube PER pregaine bleu couronne 100m', diameters:['12','16']},
+    ],
+    'Tubes PER pregaine ROUGE couronne': [
+      {name:'Tube PER pregaine rouge couronne 50m', diameters:['12','16','20','25']},
+      {name:'Tube PER pregaine rouge couronne 100m', diameters:['12']},
+    ],
+  },
+
+  multicouche: {
+    'Tubes Fluxo nu barre 4m': [
+      {name:'Tube Fluxo nu barre 4m', diameters:['16','20','26','32']},
+    ],
+    'Tubes Fluxo nu barre 5m': [
+      {name:'Tube Fluxo nu barre 5m', diameters:['40','50','63','75']},
+    ],
+    'Tubes Fluxo nu couronne 50m': [
+      {name:'Tube Fluxo nu couronne 50m', diameters:['16','20','26','32']},
+    ],
+    'Tubes Fluxo nu couronne 100m': [
+      {name:'Tube Fluxo nu couronne 100m', diameters:['16','20']},
+    ],
+    'Tubes Fluxo fourreau BLEU couronne': [
+      {name:'Tube Fluxo fourreau bleu couronne 50m', diameters:['16']},
+      {name:'Tube Fluxo fourreau bleu couronne 100m', diameters:['16']},
+    ],
+    'Tubes Fluxo fourreau ROUGE couronne': [
+      {name:'Tube Fluxo fourreau rouge couronne 50m', diameters:['16','26']},
+      {name:'Tube Fluxo pre-fourreaute couronne 50m 20x2', diameters:['20']},
+    ],
+    'Tubes Fluxo pre-isoles 10mm couronne 50m': [
+      {name:'Tube Fluxo pre-isole 10mm couronne 50m', diameters:['16','20','26']},
+      {name:'Tube Fluxo pre-isole 10mm couronne 25m', diameters:['32']},
+    ],
+    'Coudes 90 a sertir laiton bague inox': [
+      {name:'Coude 90 a sertir laiton bague inox', diameters:['16','20','26','32','40','50','63','75']},
+    ],
+    'Coudes 90 femelle a visser 15/21': [
+      {name:'Coude 90 femelle a visser 15/21', diameters:['16','20','26','32']},
+    ],
+    'Coudes 90 male a visser 15/21': [
+      {name:'Coude 90 male a visser 15/21', diameters:['16','20','26','32']},
+    ],
+    'Coudes 90 femelle a visser 20/27': [
+      {name:'Coude 90 femelle a visser 20/27', diameters:['16','20','26','32']},
+    ],
+    'Coudes 90 male a visser 20/27': [
+      {name:'Coude 90 male a visser 20/27', diameters:['16','20','26','32']},
+    ],
+    'Coudes 90 femelle a visser 26/34': [
+      {name:'Coude 90 femelle a visser 26/34', diameters:['26','32']},
+    ],
+    'Coudes 90 male a visser 26/34': [
+      {name:'Coude 90 male a visser 26/34', diameters:['26','32']},
+    ],
+    'Coudes 45 a sertir': [
+      {name:'Coude 45 a sertir laiton bague inox', diameters:['26','32','40','50','63','75']},
+    ],
+    'Manchons egaux a sertir laiton bague inox': [
+      {name:'Manchon egal a sertir laiton bague inox', diameters:['16','20','26','32','40','50','63']},
+    ],
+    'Manchons reduits a sertir': [
+      {name:'Manchon reduit a sertir', diameters:['16/20','20/16','20/26','26/16','26/20','32/16','32/20','32/26','40/20','40/26','40/32','50/20','50/26','50/32','63/40','63/50','75/40','75/50','75/63']},
+    ],
+    'Manchons femelle fixe a visser 15/21': [
+      {name:'Manchon femelle fixe 15/21 a visser', diameters:['16','20','26','32']},
+    ],
+    'Manchons male fixe a visser 15/21': [
+      {name:'Manchon male fixe 15/21 a visser', diameters:['16','20','26']},
+    ],
+    'Manchons femelle fixe a visser 20/27': [
+      {name:'Manchon femelle fixe 20/27 a visser', diameters:['16','20','26','32']},
+    ],
+    'Manchons male fixe a visser 20/27': [
+      {name:'Manchon male fixe 20/27 a visser', diameters:['16','20','26','32']},
+    ],
+    'Manchons femelle fixe a visser 26/34': [
+      {name:'Manchon femelle fixe 26/34 a visser', diameters:['16','20','26','32']},
+    ],
+    'Manchons male fixe a visser 26/34': [
+      {name:'Manchon male fixe 26/34 a visser', diameters:['16','20','26','32']},
+    ],
+    'Manchons femelle fixe a visser 33/42': [
+      {name:'Manchon femelle fixe 33/42 a visser', diameters:['32']},
+    ],
+    'Manchons femelle fixe a visser 40x49': [
+      {name:'Manchon femelle fixe 40x49 a visser', diameters:['40','50']},
+    ],
+    'Manchons male fixe a visser 40x49': [
+      {name:'Manchon male fixe 40x49 a visser', diameters:['40']},
+    ],
+    'Manchons femelle fixe a visser 50x60': [
+      {name:'Manchon femelle fixe 50x60 a visser', diameters:['50','63']},
+    ],
+    'Manchons male fixe a visser 50x60': [
+      {name:'Manchon male fixe 50x60 a visser', diameters:['50','63']},
+    ],
+    'Manchons femelle fixe 63x2 a visser': [
+      {name:'Manchon femelle fixe 63x2 a visser', diameters:['63']},
+    ],
+    'Manchons male fixe 63x2 a visser': [
+      {name:'Manchon male fixe 63x2 a visser', diameters:['63']},
+    ],
+    'Manchons femelle tournante a visser 12/17': [
+      {name:'Manchon femelle tournante 12/17 a visser', diameters:['16']},
+    ],
+    'Manchons femelle tournante a visser 15/21': [
+      {name:'Manchon femelle tournante 15/21 a visser', diameters:['16','20']},
+    ],
+    'Manchons femelle tournante a visser 20/27': [
+      {name:'Manchon femelle tournante 20/27 a visser', diameters:['16','20','26']},
+    ],
+    'Manchons femelle tournante a visser 26/34': [
+      {name:'Manchon femelle tournante 26/34 a visser', diameters:['26','32']},
+    ],
+    'Manchons femelle tournante a visser 33/42': [
+      {name:'Manchon femelle tournante 33/42 a visser', diameters:['32']},
+    ],
+    'Manchons femelle tournante 40x49': [
+      {name:'Manchon femelle tournante 40x49 a visser', diameters:['40']},
+    ],
+    'Manchons femelle tournante 50x60': [
+      {name:'Manchon femelle tournante 50x60 a visser', diameters:['50']},
+    ],
+    'Ecrous tournants': [
+      {name:'Ecrou tournant 33x42', diameters:['standard']},
+      {name:'Ecrou tournant 40x49', diameters:['standard']},
+      {name:'Ecrou tournant 50x60', diameters:['standard']},
+    ],
+    'Manchons de transition Fluxo-cuivre': [
+      {name:'Manchon transition Fluxo-cuivre a souder O18 bague inox', diameters:['20']},
+      {name:'Manchon transition Fluxo-cuivre a souder O22 bague inox', diameters:['20']},
+      {name:'Manchon transition MLP 26-PER 25', diameters:['standard']},
+    ],
+    'Tes egaux a sertir laiton bague inox': [
+      {name:'Te egal a sertir laiton bague inox', diameters:['16','20','26','32','40','50','63','75']},
+    ],
+    'Tes reduits a sertir': [
+      {name:'Te reduit a sertir', diameters:['16/20/16','20/16/16','20/16/20','20/20/16','26/16/16','26/20/16','26/26/16','26/26/20','32/16/32','32/20/32','32/26/32','32/32/16','32/32/20','32/32/26','40/20/40','40/26/40','40/32/40','40/40/26','40/40/32','50/16/50','50/20/50','50/26/50','50/32/50','50/40/50','63/26/63','63/32/63','63/40/63','63/50/63','75/50/75']},
+    ],
+    'Tes femelle a visser 15/21': [
+      {name:'Te femelle a visser 15/21', diameters:['16','20','26','32']},
+    ],
+    'Tes male a visser 15/21': [
+      {name:'Te male a visser 15/21', diameters:['16','20']},
+    ],
+    'Tes femelle a visser 20/27': [
+      {name:'Te femelle a visser 20/27', diameters:['16','20','26','32','40','50']},
+    ],
+    'Tes male a visser 20/27': [
+      {name:'Te male a visser 20/27', diameters:['16','20','26','32','40']},
+    ],
+    'Tes femelle a visser 26/34': [
+      {name:'Te femelle a visser 26/34', diameters:['26','32']},
+    ],
+    'Tes male a visser 26/34': [
+      {name:'Te male a visser 26/34', diameters:['26','32']},
+    ],
+    'Tes femelle a visser 33/42': [
+      {name:'Te femelle a visser 33/42 D32', diameters:['standard']},
+    ],
+    'Tes femelle a visser 20/27 D40': [
+      {name:'Te femelle a visser 20/27 D40', diameters:['standard']},
+    ],
+    'Tes femelle a visser 20/27 D50': [
+      {name:'Te femelle a visser 20/27 D50', diameters:['standard']},
+    ],
+    'Tes femelle a visser 20/27 D63': [
+      {name:'Te femelle a visser 20/27 D63', diameters:['standard']},
+    ],
+    'Tes egaux 40x40': [
+      {name:'Te egal a sertir D40x40', diameters:['standard']},
+    ],
+    'Tes egaux 50x50': [
+      {name:'Te egal a sertir D50x50', diameters:['standard']},
+    ],
+    'Tes egaux 63x63': [
+      {name:'Te egal a sertir D63x63', diameters:['standard']},
+    ],
+    'Tes egaux 75': [
+      {name:'Te egal a sertir D75', diameters:['standard']},
+    ],
+    'Tes femelles a visser 26/34 D75': [
+      {name:'Tes femelles a visser 26/34 D75', diameters:['standard']},
+    ],
+    'Tes reduits D75': [
+      {name:'Te reduit a sertir D75/50/75', diameters:['standard']},
+    ],
+  },
+
+  pvc_gros: {
+    'Coudes MF 45': [
+      {name:'Coude PVC MF 45', diameters:['125','140','160','200','250','315']},
+    ],
+    'Coudes FF 45': [
+      {name:'Coude PVC FF 45', diameters:['125','140','160','200','250','315']},
+    ],
+    'Coudes MF 87-30': [
+      {name:'Coude PVC MF 87-30', diameters:['125','140','160','200','250','315']},
+    ],
+    'Coudes FF 87-30': [
+      {name:'Coude PVC FF 87-30', diameters:['125','140','160','200','250','315']},
+    ],
+    'Culottes simples MF 45': [
+      {name:'Culotte simple MF 45', diameters:['125','140','160','200','250','315']},
+    ],
+    'Culottes simples FF 45': [
+      {name:'Culotte simple FF 45', diameters:['125','140','160','200','250','315']},
+    ],
+    'Culottes simples MF 87-30': [
+      {name:'Culotte simple MF 87-30', diameters:['125','140','160','200','250','315']},
+    ],
+    'Culottes simples FF 87-30': [
+      {name:'Culotte simple FF 87-30', diameters:['125','140','160','200','250','315']},
+    ],
+    'Embranchements simples MF 45': [
+      {name:'Embranchement simple MF 45', diameters:['140/100','140/125','160/100','160/125','160/140','200/100','200/125','200/140','200/160']},
+    ],
+    'Embranchements simples FF 45': [
+      {name:'Embranchement simple FF 45', diameters:['160/100','160/125','160/140','200/100','200/125','200/140','200/160']},
+    ],
+    'Manchons FF': [
+      {name:'Manchon FF', diameters:['125','140','160','200']},
+    ],
+    'Manchons dilatation': [
+      {name:'Manchon dilatation simple', diameters:['125']},
+      {name:'Manchon dilatation horizontal', diameters:['125','140','160','200']},
+    ],
+    'Manchons a butee FF': [
+      {name:'Manchon a butee FF', diameters:['250','315']},
+    ],
+    'Manchon FF collerette gorge': [
+      {name:'Manchon FF collerette gorge', diameters:['250']},
+    ],
+    'Reductions excentriques MF': [
+      {name:'Reduction excentree MF', diameters:['125/100','140/100','140/125','160/100','160/125','160/140','200/125','200/140','200/160']},
+    ],
+    'Reductions exterieures excentriques MF': [
+      {name:'Reduction exterieure excentree MF', diameters:['250/100','250/125','250/160','250/200','315/160','315/200','315/250']},
+    ],
+    'Tampons de reduction': [
+      {name:'Tampon de reduction', diameters:['125/100']},
+    ],
+    'Tampons de visite': [
+      {name:'Tampon de visite', diameters:['125','140','160','200']},
+    ],
+  },
+
 
   gaines_cvc: {
     'Gaines flexibles nues M0 Aluflex L10ml': [
@@ -593,6 +859,10 @@ const MATERIALS = {
     'Patte a vis': [
       {name:'Patte a vis metaux O6x40 M7x150', diameters:['centaine']},
     ],
+    'Rails strut perfores GS': [
+      {name:'Rail strut perfore GS 41x21x2mm', diameters:['LG3m','LG6m']},
+      {name:'Rail strut perfore GS 41x41x2mm', diameters:['LG3m','LG6m']},
+    ],
   },
 
   chevilles: {
@@ -644,6 +914,10 @@ const MATERIALS = {
     ],
     'Pince de serrage VMC': [
       {name:'Pince de serrage pour cadre VMC', diameters:['centaine']},
+    ],
+    'Boulons & vis zinguees classe 6.8 (boite 25)': [
+      {name:'Boulon zingue (vis+ecrou) classe 6.8', diameters:['12x50','16x40','16x45','16x50','16x60','16x70','20x70','20x80']},
+      {name:'Vis zinguee classe 6.8', diameters:['16x30','16x35','16x40','16x45','16x50','16x60','20x40','20x45 (8.8)','20x50','20x55','20x60','20x65']},
     ],
   },
 
@@ -759,6 +1033,9 @@ const MATERIALS = {
       {name:'Inter-sectionneur Isolator 3P', diameters:['20A','32A','40A']},
       {name:'Inter-sectionneur Isolator 4P', diameters:['20A','32A','40A']},
     ],
+    'Plots anti-vibratiles': [
+      {name:'Plaque Gripsol support amortisseur caoutchouc ep.11mm', diameters:['500x500mm']},
+    ],
   },
 
   consommables: {
@@ -774,6 +1051,234 @@ const MATERIALS = {
     ],
     'Divers chantier': [
       {name:'Traceur chantier fluo orange Soppec', diameters:['standard']},
+    ],
+  },
+
+  inox_sertir: {
+    'Tubes inox a sertir 304L barre 6m': [
+      {name:'Tube inox a sertir 304L barre 6m', diameters:['15x1','18x1','22x1.2','28x1.2','35x1.5','42x1.5','54x1.5']},
+    ],
+    'Tubes inox 316L barre 6m': [
+      {name:'Tube inox 316L barre 6m', diameters:['15x1','18x1','22x1.2','28x1.2','35x1.5','42x1.5','54x1.5']},
+    ],
+    'Coudes F-F 45 Inoxpres a sertir': [
+      {name:'Coude F/F 45 Inoxpres a sertir', diameters:['15','18','22','28','35','42','54']},
+    ],
+    'Coudes M-F 45 Inoxpres a sertir': [
+      {name:'Coude M/F 45 Inoxpres a sertir', diameters:['15','18','22','28','35','42','54']},
+    ],
+    'Coudes F-F 90 Inoxpres a sertir': [
+      {name:'Coude F/F 90 Inoxpres a sertir', diameters:['15','18','22','28','35','42','54']},
+    ],
+    'Coudes M-F 90 Inoxpres a sertir': [
+      {name:'Coude M/F 90 Inoxpres a sertir', diameters:['15','18','22','28','35','42','54']},
+    ],
+    'Manchons Inoxpres a sertir': [
+      {name:'Manchon Inoxpres a sertir', diameters:['15','18','22','28','35','42','54']},
+    ],
+    'Raccords ecrou libre Inoxpres': [
+      {name:'Raccord ecrou libre Inoxpres', diameters:['15x1/2','18x1/2','18x3/4','22x3/4','22x1P','28x1P','28x1P1/4','35x1P1/4','42x1P1/2','54x2P']},
+    ],
+    'Raccords fil femelle Inoxpres': [
+      {name:'Raccord fil femelle Inoxpres', diameters:['15x1/2','18x1/2','18x3/4','22x1/2','22x3/4','22x1P','28x1P','35x1P','35x1P1/4','42x1P1/2','54x2P']},
+    ],
+    'Raccords fil male Inoxpres': [
+      {name:'Raccord fil male Inoxpres', diameters:['15x1/2','18x1/2','18x3/4','22x1/2','22x3/4','22x1P','28x3/4','28x1P','35x1P','35x1P1/4','42x1P1/4','42x1P1/2','54x1P1/2','54x2P']},
+    ],
+    'Raccords union fil male Inoxpres': [
+      {name:'Raccord union fil male Inoxpres', diameters:['15x3/4','18x1/2','22x1/2','22x3/4','22x1P','28x1P','35x1P1/4','42x1P1/2','54x2P']},
+    ],
+    'Raccords union taraude femelle Inoxpres': [
+      {name:'Raccord union taraude F Inoxpres', diameters:['15x1/2','18x3/4','22x3/4','28x1P','35x1P1/4','54x2P']},
+    ],
+    'Reductions M-F Inoxpres': [
+      {name:'Reduction M/F Inoxpres', diameters:['18x15','22x15','22x18','28x18','28x22','35x18','35x22','35x28','42x18','42x22','42x28','42x35','54x22','54x28','54x35','54x42']},
+    ],
+    'Tes egaux Inoxpres': [
+      {name:'Te egal Inoxpres', diameters:['15','18','22','28','35','42','54']},
+    ],
+    'Tes mixtes fil femelle Inoxpres': [
+      {name:'Te mixte fil F Inoxpres', diameters:['15x1/2x15','18x1/2x18','22x1/2x22','28x3/4x28','35x3/4x35','42x1/2x42','42x3/4x42','54x1/2x54','54x2Px54']},
+    ],
+    'Tes reduits Inoxpres': [
+      {name:'Te reduit Inoxpres', diameters:['22x15x22','22x18x22','28x15x28','28x18x28','28x22x28','35x15x35','35x18x35','35x22x35','35x28x35','42x22x42','42x35x42','54x18x54','54x22x54','54x28x54','54x42x54']},
+    ],
+  },
+
+  pvc_evac: {
+    'Coudes PVC 20-30': [
+      {name:'Coude PVC MF 20', diameters:['100']},
+      {name:'Coude PVC FF 20', diameters:['100']},
+      {name:'Coude PVC MF 30', diameters:['100']},
+      {name:'Coude PVC FF 30', diameters:['100']},
+    ],
+    'Coudes PVC 45 MF': [
+      {name:'Coude PVC MF 45', diameters:['32','40','50','75','80','100']},
+    ],
+    'Coudes PVC 45 FF': [
+      {name:'Coude PVC FF 45', diameters:['32','40','50','75','80','100']},
+    ],
+    'Coudes PVC 67': [
+      {name:'Coude PVC MF 67', diameters:['40','100']},
+      {name:'Coude PVC FF 67', diameters:['40','100']},
+    ],
+    'Coudes PVC 87 MF': [
+      {name:'Coude PVC MF 87', diameters:['32','40','50','75','80','100']},
+    ],
+    'Coudes PVC 87 FF': [
+      {name:'Coude PVC FF 87', diameters:['32','40','50','75','80','100']},
+    ],
+    'Secteurs de coude PVC': [
+      {name:'Secteur de coude 15', diameters:['100']},
+      {name:'Secteur de coude 30', diameters:['100']},
+    ],
+    'Culottes simples PVC 45': [
+      {name:'Culotte simple PVC 45 MF', diameters:['32','40','50','75','80','100','100/40','100/50']},
+      {name:'Culotte simple PVC 45 FF', diameters:['32','40','50','75','80','100']},
+    ],
+    'Culottes simples PVC 67': [
+      {name:'Culotte simple PVC 67 MF', diameters:['100','100/50']},
+    ],
+    'Culottes simples PVC 87': [
+      {name:'Culotte simple PVC 87 MF', diameters:['75','80','100','100/40','100/50']},
+      {name:'Culotte simple PVC 87 FF', diameters:['75','80','100']},
+    ],
+    'Tes pied de biche PVC 87': [
+      {name:'Te pied de biche 87 MF', diameters:['32','40','50']},
+      {name:'Te pied de biche 87 FF', diameters:['32','40','50']},
+    ],
+    'Culottes doubles paralleles PVC D100': [
+      {name:'Culotte double parallele PVC 45 MF', diameters:['100']},
+      {name:'Culotte double parallele PVC 45 FF', diameters:['100']},
+      {name:'Culotte double parallele PVC 87 MF', diameters:['100']},
+      {name:'Culotte double parallele PVC 87 FF', diameters:['100']},
+    ],
+    'Culottes doubles equerre PVC D100': [
+      {name:'Culotte double equerre PVC 45 MF', diameters:['100']},
+      {name:'Culotte double equerre PVC 45 FF', diameters:['100']},
+      {name:'Culotte double equerre PVC 87 MF', diameters:['100']},
+      {name:'Culotte double equerre PVC 87 FF', diameters:['100']},
+    ],
+    'Culottes joint dilatation systeme J PVC D100': [
+      {name:'Culotte simple joint dilat. 45 systeme J', diameters:['100']},
+      {name:'Culotte simple 67 MF systeme J', diameters:['100']},
+      {name:'Culotte simple joint dilat. 87.30 systeme J', diameters:['100']},
+      {name:'Culotte double joint dilat. 67 systeme J', diameters:['100']},
+      {name:'Culotte double joint dilat. 87.30 systeme J', diameters:['100']},
+    ],
+    'Manchons de dilatation PVC': [
+      {name:'Manchon dilatation simple', diameters:['100']},
+      {name:'Manchon dilatation horizontal', diameters:['40','100']},
+    ],
+    'Manchons PVC FF': [
+      {name:'Manchon PVC FF', diameters:['32','40','50','75','80','100','110']},
+    ],
+    'Reductions incorporees PVC MF': [
+      {name:'Reduction incorporee PVC MF', diameters:['40x32','50x32','50x40']},
+    ],
+    'Tampons de reduction PVC': [
+      {name:'Tampon reduction simple', diameters:['100x32','100x40','100x50','110x100']},
+      {name:'Tampon reduction double', diameters:['100x40x40']},
+      {name:'Tampon reduction male', diameters:['93/40','93/50','93/40/40']},
+      {name:'Tampon reduction D118 male-100 fem', diameters:['standard']},
+    ],
+    'Manchettes de reparation PVC': [
+      {name:'Manchette reparation male', diameters:['100/93','D125']},
+    ],
+    'Tampons de visite PVC': [
+      {name:'Tampon de visite PVC', diameters:['32','40','50','75','80','100','110']},
+    ],
+  },
+
+  robinetterie: {
+    'Vannes a boisseau spherique ACS FF poignee plate serie 580': [
+      {name:'Vanne BS ACS FF poignee plate RGE serie 580', diameters:['3/8','1/2','3/4','1"','1"1/4','1"1/2','2"']},
+    ],
+    'Vannes a boisseau spherique ACS MF poignee plate serie 581': [
+      {name:'Vanne BS ACS MF poignee plate RGE serie 581', diameters:['3/8','1/2','3/4','1"','1"1/4','1"1/2','2"']},
+    ],
+    'Vannes a sphere laiton 615 prolongateur fixe': [
+      {name:'Vanne a sphere laiton 615 prolongateur fixe', diameters:['1/2','3/4','1"','1"1/4','1"1/2','2"']},
+    ],
+    'Vannes sphere ACS prolongateur MF poignee RGE': [
+      {name:'Vanne sphere ACS prolongateur MF poignee RGE', diameters:['1/2','3/4','1"','1"1/4','1"1/2','2"']},
+    ],
+    'Vannes papillon PAP fonte GS levier': [
+      {name:'Vanne PAP OT CL623T fonte GS levier', diameters:['DN40','DN50','DN65','DN80','DN100','DN125','DN150']},
+    ],
+    'Vannes TA equilibrage STAD IMI Hydronic PN25': [
+      {name:'Vanne STAD PN25 IMI Hydronic', diameters:['DN10','DN15','DN20','DN25','DN32','DN40','DN50']},
+    ],
+    'Vannes TA equilibrage STAF IMI Hydronic PN16': [
+      {name:'Vanne STAF PN16 IMI Hydronic', diameters:['DN65','DN80','DN100','DN150']},
+    ],
+    'Purgeurs': [
+      {name:'Purgeur ZUPN DN15 IMI Hydronic', diameters:['standard']},
+      {name:'Purgeur coude Aercal PA15 Thermador', diameters:['1/2']},
+      {name:'Purgeur coude Flexvent H Nickele Flamco', diameters:['1/2']},
+      {name:'Purgeur coude Flexvent H Blanc Flamco', diameters:['1/2']},
+    ],
+  },
+
+  sanitaire: {
+    'Kits raccordement WC suspendu': [
+      {name:'Kit raccord WC suspendu PMR L40cm d90-d45', diameters:['standard']},
+      {name:'Kit raccord WC suspendu joint levres L18.5cm chrome mat d90-d45', diameters:['standard']},
+    ],
+    'Collecteurs sanitaires monobloc a vannes': [
+      {name:'Collecteur MF 3/4 monobloc a vannes 1/2', diameters:['2 departs','3 departs','4 departs','5 departs','6 departs','7 departs','8 departs']},
+    ],
+    'Platines Robifix a sertir': [
+      {name:'Robifix a sertir entraxe 60mm M3/8 ST', diameters:['D12','D16']},
+      {name:'Robifix mono a sertir type Acome F1/2', diameters:['D12','D16']},
+      {name:'Robifix a sertir entraxe 150mm F1/2 ST D12', diameters:['standard']},
+      {name:'Sortie cloison PER 150mm F1/2-16', diameters:['standard']},
+      {name:'Robifix 150mm F1/2 CU D14 pour cuivre a souder', diameters:['standard']},
+    ],
+  },
+
+  chauffe_eau: {
+    'Chauffe-eau Duralis ACI hybride': [
+      {name:'Duralis VM', diameters:['100L','150L','200L']},
+      {name:'Duralis VM Compact', diameters:['100L','150L','200L']},
+      {name:'Duralis VS', diameters:['150L','200L','250L','300L']},
+      {name:'Duralis HM', diameters:['100L','150L','200L']},
+      {name:'Duralis ACI Hyb VM 050L', diameters:['standard']},
+      {name:'Duralis VM 075L', diameters:['standard']},
+    ],
+    'Chauffe-eau Steatis standard': [
+      {name:'Steatis Comp VM', diameters:['100L','150L','200L']},
+      {name:'Steatis VM', diameters:['050L','075L','100L','150L','200L']},
+      {name:'Steatis VS', diameters:['200L','250L','300L']},
+      {name:'Steatis HM', diameters:['075L','100L','150L','200L']},
+    ],
+    'Chauffe-eau plat Malicio': [
+      {name:'Malicio 3 MP', diameters:['040L','065L','080L','100L']},
+      {name:'Malicio 3 VM', diameters:['100L','120L','150L']},
+    ],
+    'Chauffe-eau blinde': [
+      {name:'TH Blinde etroit VM 050L', diameters:['standard']},
+      {name:'TH Blinde VM', diameters:['050L','075L','100L','150L','200L']},
+      {name:'TH Blinde Comp VM', diameters:['100L','150L','200L']},
+      {name:'TH Blinde VS', diameters:['200L (Stable)','300L']},
+      {name:'TH Blinde HM', diameters:['075L','100L','150L','200L']},
+      {name:'TH Blinde HM racc. cote', diameters:['075L','100L','150L','200L']},
+    ],
+    'Chauffe-eau petites capacites Ristretto': [
+      {name:'Ristretto sur 010L', diameters:['standard']},
+      {name:'Ristretto sous 010L', diameters:['standard']},
+      {name:'Ristretto Compact sur 015L', diameters:['standard']},
+      {name:'Ristretto Compact sous 015L', diameters:['standard']},
+      {name:'Ristretto sur 015L', diameters:['standard']},
+      {name:'Ristretto sur 030L', diameters:['standard']},
+      {name:'Ristretto 2 carre sur 015L', diameters:['standard']},
+      {name:'Ristretto 2 carre sous 015L', diameters:['standard']},
+      {name:'Ristretto 2 carre sur 030L', diameters:['standard']},
+    ],
+    'Chauffe-eau PECS': [
+      {name:'TH PECS MP', diameters:['100L','150L','200L']},
+      {name:'TH PECS VM', diameters:['100L','150L','200L']},
+      {name:'TH PECS VS 200L', diameters:['standard']},
     ],
   },
 
