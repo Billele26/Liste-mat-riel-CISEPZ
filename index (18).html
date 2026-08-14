@@ -1,0 +1,2736 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#b8e4f4">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Liste Cisepz">
+<meta name="description" content="Préparation matériel chantier — CISEPZ Génie Climatique">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Liste By Cisepz</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0a1620;--bg2:#0e1f2e;--surface:#132738;--surface2:#1a3448;--border:#254a61;--amber:#22c3ea;--accent2:#7fe0f7;--text:#eaf5fb;--muted:#7398ac;--red:#ff5c5c;--green:#2ed573;--radius:12px}
+html,body{height:100%;overflow-x:hidden}
+body{font-family:'Space Grotesk',sans-serif;background:radial-gradient(ellipse 900px 500px at 50% -10%,var(--bg2) 0%,var(--bg) 55%);background-attachment:fixed;color:var(--text);font-size:14px;-webkit-tap-highlight-color:transparent}
+header{background:linear-gradient(135deg,#b8e4f4 0%,#d6f0fa 40%,#b8e4f4 100%);border-bottom:3px solid #000;padding:env(safe-area-inset-top,0) 0 0;position:sticky;top:0;z-index:100;box-shadow:0 8px 24px -8px rgba(0,0,0,.45)}
+.header-inner{max-width:720px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 16px}
+.cisepz-logo{display:flex;align-items:center}
+.cisepz-logo-img{height:32px;width:auto;display:block}
+.header-right{display:flex;align-items:center;gap:10px}
+.app-label{text-align:right}
+.app-label-top{font-size:10px;font-weight:700;letter-spacing:.08em;color:#000;text-transform:uppercase}
+.app-label-bot{font-size:8px;color:#333;letter-spacing:.05em;font-family:'JetBrains Mono',monospace}
+.btn-icon{background:rgba(0,0,0,0.08);border:1.5px solid rgba(0,0,0,0.2);color:#000;padding:8px;border-radius:var(--radius);cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;-webkit-appearance:none}
+.btn-icon:active{background:rgba(0,0,0,0.18)}
+.badge{position:absolute;top:-5px;right:-5px;background:#000;color:#7ec8e3;font-size:9px;font-weight:700;font-family:'JetBrains Mono',monospace;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center}
+#install-banner{display:none;background:#000;color:#7ec8e3;padding:10px 16px;align-items:center;justify-content:space-between;gap:10px;font-size:12px;font-weight:500}
+#install-banner button{background:var(--amber);color:#000;border:none;border-radius:7px;padding:7px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+#install-banner .close-banner{background:none;border:none;color:#7ec8e3;font-size:18px;cursor:pointer;padding:0 4px}
+main{max-width:720px;margin:0 auto;padding:16px 16px calc(env(safe-area-inset-bottom,0px) + 16px)}
+.view{display:none;animation:fadeIn .2s ease}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.section-label{font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.networks-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media(max-width:400px){.networks-grid{grid-template-columns:repeat(2,1fr)}}
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:16px}
+.search-bar svg{color:var(--muted);flex-shrink:0}
+.search-bar input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:'Space Grotesk',sans-serif;padding:0;margin:0}
+.search-bar input::placeholder{color:var(--muted)}
+#search-clear{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 4px;flex-shrink:0}
+.search-row{margin-bottom:8px}
+.search-meta{font-size:9px;font-family:'JetBrains Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.search-chip{position:relative}
+.search-chip.quick-added{border-color:var(--green);background:rgba(63,185,80,.15)}
+.search-more{text-align:center;font-size:11px;color:var(--muted);padding:12px 0;font-family:'JetBrains Mono',monospace}
+.search-empty{text-align:center;padding:32px 0;color:var(--muted)}
+.chantier-create{display:flex;gap:8px;margin-bottom:18px}
+.chantier-create input{flex:1;margin:0}
+.chantier-create button{padding:0 16px;background:var(--amber);color:#000;border:none;border-radius:var(--radius);font-weight:700;font-size:13px;cursor:pointer;font-family:'Space Grotesk',sans-serif;-webkit-appearance:none}
+.chantier-tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.chantier-tab{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;color:var(--muted);font-size:12px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;-webkit-appearance:none}
+.chantier-tab.active{border-color:var(--amber);color:var(--amber)}
+.multi-export-btn{margin-left:auto;background:none;border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:11px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;-webkit-appearance:none}
+.chantier-card{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;flex-wrap:wrap;box-shadow:0 2px 6px -2px rgba(0,0,0,.3);transition:border-color .12s ease}
+.chantier-card.active{border-color:var(--amber);background:rgba(242,245,248,.06)}
+.chantier-info{flex:1;min-width:0}
+.chantier-name{font-weight:600;font-size:14px;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chantier-meta{font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace}
+.chantier-actions{display:flex;gap:6px;flex-shrink:0;flex-wrap:wrap}
+.chantier-actions button{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);cursor:pointer;font-size:11px;font-weight:600;font-family:'Space Grotesk',sans-serif;-webkit-appearance:none;display:flex;align-items:center;gap:5px}
+.chantier-actions .add-mat-btn{border-color:var(--amber);color:var(--amber);background:rgba(34,195,234,.08)}
+.chantier-actions .del-chantier{color:var(--red);border-color:var(--red)}
+.filter-chip{display:flex;align-items:center;justify-content:space-between;gap:8px;background:rgba(242,245,248,.08);border:1px solid var(--amber);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;font-size:12px}
+.filter-chip button{background:none;border:none;color:var(--amber);font-weight:700;cursor:pointer;font-size:12px;font-family:'Space Grotesk',sans-serif}
+.net-card{background:linear-gradient(160deg,var(--surface) 0%,var(--surface2) 130%);border:1px solid var(--border);border-radius:var(--radius);padding:16px 12px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:6px;-webkit-appearance:none;width:100%;box-shadow:0 2px 8px -2px rgba(0,0,0,.35);transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+.net-card:active{transform:scale(.96);border-color:var(--amber);box-shadow:0 1px 3px -1px rgba(0,0,0,.4)}
+@media(hover:hover){.net-card:hover{border-color:var(--amber);box-shadow:0 6px 18px -4px rgba(34,195,234,.25)}}
+.net-card .net-icon{font-size:19px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;background:rgba(34,195,234,.12);border-radius:9px}
+.net-card .net-name{font-weight:600;font-size:12px;color:var(--text)}
+.net-card .net-desc{font-size:10px;color:var(--muted);line-height:1.35}
+.back-btn{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;font-family:'Space Grotesk',sans-serif;padding:0;margin-bottom:16px;-webkit-appearance:none}
+.back-btn:active{color:var(--amber)}
+.back-btn svg{width:16px;height:16px}
+.view-header{margin-bottom:14px}
+.view-title{font-size:18px;font-weight:700;color:var(--text)}
+.view-sub{font-size:11px;color:var(--muted)}
+input[type=text],input[type=date],input[type=email],select{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;color:var(--text);font-size:13px;font-family:'Space Grotesk',sans-serif;outline:none;transition:border .15s;margin-bottom:10px;-webkit-appearance:none;appearance:none}
+input[type=text]:focus,input[type=date]:focus,input[type=email]:focus,select:focus{border-color:var(--amber)}
+select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238b949e' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+select option{background:var(--surface2);color:var(--text)}
+.cat-block{margin-bottom:8px}
+.cat-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;width:100%;-webkit-appearance:none}
+.cat-header:active{border-color:var(--amber)}
+.cat-name{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--amber);font-family:'JetBrains Mono',monospace;text-align:left}
+.cat-arrow{color:var(--muted);font-size:11px;transition:transform .2s;flex-shrink:0}
+.cat-arrow.open{transform:rotate(180deg)}
+.cat-items{display:none;padding:6px 0 4px}
+.cat-items.open{display:block}
+.mat-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:6px}
+.mat-name{font-size:12px;font-weight:500;margin-bottom:8px;color:var(--text)}
+.diams{display:flex;flex-wrap:wrap;gap:5px}
+.diam-chip{display:flex;align-items:center;gap:5px;padding:6px 9px;background:var(--surface2);border:1px solid var(--border);border-radius:7px;font-size:11px;cursor:pointer;user-select:none}
+.diam-chip:active{border-color:var(--amber)}
+.diam-chip.selected{border-color:var(--amber);background:rgba(34,195,234,.12)}
+.diam-chip input[type=checkbox]{accent-color:var(--amber);width:13px;height:13px;cursor:pointer;flex-shrink:0}
+.diam-label{font-family:'JetBrains Mono',monospace;color:var(--muted);font-size:10px}
+.diam-chip.selected .diam-label{color:var(--amber)}
+.qty-input{width:42px;background:var(--surface);border:1px solid var(--amber);border-radius:5px;padding:2px 4px;text-align:center;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--amber);outline:none;display:none;margin:0}
+.diam-chip.selected .qty-input{display:inline-block}
+.custom-row{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:11px 13px;margin-bottom:6px}
+.custom-row .mat-name{color:var(--muted);font-style:italic}
+.custom-input-row{display:flex;gap:8px}
+.custom-input-row input{margin:0;flex:1;min-width:0}
+.custom-add-btn{background:var(--amber);color:#000;border:none;border-radius:7px;padding:8px 12px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;white-space:nowrap;flex-shrink:0}
+.custom-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.custom-chip{display:flex;align-items:center;gap:6px;padding:6px 9px;background:rgba(242,245,248,.1);border:1px solid var(--amber);border-radius:7px;font-size:12px}
+.custom-chip span{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--amber)}
+.custom-chip input{width:38px;background:var(--surface);border:1px solid var(--amber);border-radius:5px;padding:2px 4px;text-align:center;font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--amber);outline:none;margin:0}
+.custom-chip button{background:none;border:none;color:var(--muted);cursor:pointer;padding:0;font-size:14px;line-height:1}
+.sticky-bar{position:sticky;bottom:0;padding:10px 0 calc(env(safe-area-inset-bottom,0px) + 10px);background:linear-gradient(to top,var(--bg) 60%,transparent)}
+.add-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--amber) 0%,var(--accent2) 100%);color:#04222c;border:none;border-radius:var(--radius);font-size:14px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-appearance:none;box-shadow:0 4px 16px -4px rgba(34,195,234,.5)}
+.add-btn:active{opacity:.85}
+.add-btn:disabled{opacity:.35;cursor:not-allowed}
+.list-group{margin-bottom:16px}
+.list-group-title{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--amber);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px}
+.list-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;gap:8px;box-shadow:0 1px 4px -1px rgba(0,0,0,.25)}
+.list-item.missing{border-color:var(--red);background:rgba(248,81,73,.07)}
+.missing-btn{background:var(--surface2);border:1px solid var(--border);border-radius:7px;width:26px;height:26px;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;color:transparent;-webkit-appearance:none}
+.missing-btn.flagged{background:var(--red);border-color:var(--red);color:#fff}
+.reception-summary{display:flex;align-items:center;justify-content:space-between;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;margin-bottom:12px;font-size:12px}
+.reception-summary .rs-count{font-family:'JetBrains Mono',monospace;font-weight:700}
+.reception-summary .rs-count.complete{color:var(--green)}
+.reception-summary .rs-count.incomplete{color:var(--red)}
+.reception-summary button{background:none;border:1px solid var(--red);color:var(--red);border-radius:8px;padding:6px 10px;font-size:11px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;-webkit-appearance:none}
+.list-item-info{flex:1;min-width:0}
+.list-item-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item-meta{font-size:10px;color:var(--muted);font-family:'JetBrains Mono',monospace;margin-top:2px}
+.qty-ctrl{display:flex;align-items:center;gap:6px;margin:0 10px;flex-shrink:0}
+.qty-ctrl button{background:var(--surface2);border:1px solid var(--border);color:var(--muted);width:26px;height:26px;border-radius:6px;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;-webkit-appearance:none}
+.qty-ctrl button:active{border-color:var(--amber);color:var(--amber)}
+.qty-val{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--amber);min-width:28px;text-align:center}
+.del-btn{background:none;border:none;color:var(--muted);cursor:pointer;padding:4px;display:flex;flex-shrink:0}
+.del-btn:active{color:var(--red)}
+.delivery-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.delivery-title{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--amber);letter-spacing:.06em;text-transform:uppercase;margin-bottom:12px}
+.preview-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.preview-text{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:12px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--muted);max-height:160px;overflow-y:auto;white-space:pre-wrap;word-break:break-word;line-height:1.6}
+.actions-grid{display:grid;gap:8px}
+.action-btn{padding:13px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface);color:var(--text);font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-appearance:none;width:100%}
+.action-btn:active{border-color:var(--amber);color:var(--amber)}
+.action-btn.danger:active{border-color:var(--red);color:var(--red)}
+.action-btn.pdf-btn{border-color:#e74c3c;color:#e74c3c}
+.action-btn.pdf-btn:active{background:rgba(231,76,60,.1)}
+.action-btn.email-pdf-btn{border-color:#9b59b6;color:#9b59b6}
+.action-btn.email-pdf-btn:active{background:rgba(155,89,182,.1)}
+
+/* Modal PDF email */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:24px;width:100%;max-width:400px;animation:fadeIn .2s ease}
+.modal-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(--muted);margin-bottom:20px}
+.modal-actions{display:flex;gap:8px;margin-top:4px}
+.modal-cancel{flex:1;padding:12px;background:var(--surface2);color:var(--muted);border:1px solid var(--border);border-radius:var(--radius);font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.modal-send{flex:1;padding:12px;background:#9b59b6;color:#fff;border:none;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.modal-send:active{opacity:.85}
+
+.confirm-row{display:flex;gap:8px;margin-top:4px}
+.confirm-row button{flex:1;padding:12px;border-radius:var(--radius);font-size:13px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;-webkit-appearance:none}
+.confirm-yes{background:var(--red);color:#fff;border:none}
+.confirm-no{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+.empty{text-align:center;padding:48px 0;color:var(--muted)}
+.empty .empty-icon{font-size:40px;margin-bottom:12px}
+.empty p{font-size:13px}
+.toast{position:fixed;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:var(--radius);font-size:13px;font-weight:600;z-index:999;pointer-events:none;opacity:0;transition:opacity .2s;white-space:nowrap}
+.toast.show{opacity:1}
+.toast.ok{background:var(--green);color:#000}
+.toast.err{background:var(--red);color:#fff}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* PDF EMAIL MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border-radius:16px 16px 0 0;border:1px solid var(--border);border-bottom:none;padding:24px 20px calc(env(safe-area-inset-bottom,0px) + 24px);width:100%;max-width:720px;animation:slideUp .25s ease}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-title{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px}
+.modal-sub{font-size:11px;color:var(--muted);margin-bottom:16px}
+.modal-actions{display:flex;gap:8px;margin-top:14px}
+.modal-cancel{flex:1;padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);color:var(--muted);font-size:13px;font-weight:600;cursor:pointer;font-family:'Space Grotesk',sans-serif}
+.modal-send{flex:2;padding:12px;background:#e74c3c;border:none;border-radius:var(--radius);color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
+.modal-send:active,.modal-cancel:active{opacity:.85}
+.modal-download{flex:2;padding:12px;background:linear-gradient(135deg,var(--amber) 0%,var(--accent2) 100%);border:none;border-radius:var(--radius);color:#04222c;font-size:13px;font-weight:700;cursor:pointer;font-family:'Space Grotesk',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 14px -4px rgba(34,195,234,.5)}
+.modal-download:active{opacity:.85}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<div id="install-banner">
+  <span>📲 Installer l'app sur votre téléphone</span>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button id="install-btn">Installer</button>
+    <button class="close-banner" id="close-banner">✕</button>
+  </div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="cisepz-logo">
+      <img src="data:image/png;base64,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" alt="CISEPZ Génie Climatique" class="cisepz-logo-img">
+    </div>
+    <div class="header-right">
+      <div class="app-label">
+        <div class="app-label-top">Liste Matériel</div>
+        <div class="app-label-bot">préparation chantier</div>
+      </div>
+      <button class="btn-icon" onclick="showChantiers()" title="Mes chantiers">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><path d="M9 9v.01"/><path d="M9 12v.01"/><path d="M9 15v.01"/><path d="M9 18v.01"/></svg>
+      </button>
+      <button class="btn-icon" onclick="showLists()" title="Voir la liste">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg>
+        <span class="badge" id="badge" style="display:none">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Networks -->
+  <div class="view active" id="view-networks">
+    <div id="active-chantier-banner" class="filter-chip" style="display:none">
+      <span id="active-chantier-text"></span>
+      <button onclick="exitChantier()">Changer ✕</button>
+    </div>
+    <div class="section-label">Rechercher un matériau</div>
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="global-search" placeholder="Ex: coude cuivre, D40, vanne..." oninput="handleSearchInput(this.value)">
+      <button id="search-clear" onclick="clearSearch()" style="display:none">✕</button>
+    </div>
+    <div id="search-results" style="display:none"></div>
+    <div class="section-label" id="networks-label">Ou sélectionnez le type de réseau</div>
+    <div class="networks-grid" id="networks-grid"></div>
+  </div>
+
+  <!-- Materials -->
+  <div class="view" id="view-materials">
+    <button class="back-btn" onclick="goHome()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Retour
+    </button>
+    <div class="view-header">
+      <div class="view-title" id="mat-title"></div>
+      <div class="view-sub">Cochez et indiquez les quantités</div>
+    </div>
+    <select id="project-name" onchange="handleProjectSelectChange(this)"></select>
+    <div id="mat-categories"></div>
+    <div class="sticky-bar">
+      <button class="add-btn" id="btn-add" onclick="addToList()" disabled>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <span id="btn-add-text">Ajouter à la liste</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Chantiers -->
+  <div class="view" id="view-chantiers">
+    <button class="back-btn" onclick="goHome()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Retour
+    </button>
+    <div class="view-header">
+      <div class="view-title">Mes chantiers</div>
+      <div class="view-sub">Recherchez un code chantier officiel ou créez le vôtre</div>
+    </div>
+    <div class="chantier-create">
+      <input type="text" id="new-chantier-name" placeholder="Nom du chantier (ex: A26-5789 Siemens)" onkeydown="if(event.key==='Enter')addChantier()">
+      <button onclick="addChantier()">Créer</button>
+    </div>
+    <div class="search-bar" style="margin-bottom:12px">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" id="chantier-search" placeholder="Rechercher un code chantier (ex: A26-0031)..." oninput="filterChantiers(this.value)">
+    </div>
+    <div class="chantier-tabs">
+      <button class="chantier-tab active" id="tab-actifs" onclick="setChantierTab(false)">Actifs</button>
+      <button class="chantier-tab" id="tab-archives" onclick="setChantierTab(true)">Archivés</button>
+      <button class="multi-export-btn" onclick="importOfficialChantiers()">📥 MAJ chantiers officiels</button>
+      <button class="multi-export-btn" onclick="openMultiExportModal()">📤 Export multi-chantiers</button>
+    </div>
+    <div id="chantiers-list"></div>
+    <div id="chantiers-empty" class="empty" style="display:none">
+      <div class="empty-icon">🏗️</div>
+      <p>Aucun chantier créé pour le moment</p>
+    </div>
+  </div>
+
+  <!-- Lists -->
+  <div class="view" id="view-lists">
+    <button class="back-btn" onclick="goHome()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>Retour
+    </button>
+    <div class="view-header"><div class="view-title" id="lists-title">Liste de matériel</div></div>
+    <div id="list-filter-chip" class="filter-chip" style="display:none">
+      <span id="list-filter-text"></span>
+      <button onclick="clearListFilter()">Voir tout ✕</button>
+    </div>
+    <div id="reception-summary" class="reception-summary" style="display:none">
+      <span id="rs-text">🚚 <span class="rs-count" id="rs-count">0</span> manquant(s)</span>
+      <button onclick="showMissingReport()">Voir manquants</button>
+    </div>
+    <div id="saved-items"></div>
+    <div id="empty-list" class="empty" style="display:none">
+      <div class="empty-icon">📦</div>
+      <p>Aucun matériel pour le moment</p>
+    </div>
+    <div id="list-extras" style="display:none">
+      <div class="delivery-section">
+        <div class="delivery-title">Informations de livraison</div>
+        <input type="text" id="companion-name" placeholder="Nom du compagnon">
+        <input type="text" id="site-number" placeholder="N° de chantier (ex: A26-5789)">
+        <input type="date" id="delivery-date">
+        <select id="delivery-location">
+          <option value="">-- Sélectionner le lieu --</option>
+          <option value="CISEPZ">CISEPZ</option>
+          <option value="Chantier">Chantier</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <div class="preview-box" id="preview-box" style="display:none">
+        <div class="delivery-title" style="margin-bottom:8px">Aperçu de l'export</div>
+        <div class="preview-text" id="preview-text"></div>
+        <button class="action-btn" onclick="copyText()" style="margin-top:10px">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>Copier le texte
+        </button>
+      </div>
+      <div class="actions-grid">
+        <button class="action-btn pdf-btn" onclick="downloadPDF()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          Télécharger PDF
+        </button>
+        <button class="action-btn" style="border-color:#1d6f42;color:#1d6f42;font-weight:700" onclick="downloadExcel()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+          Télécharger Excel
+        </button>
+        <button class="action-btn" onclick="sendEmail()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          Envoyer par Email
+        </button>
+        <button class="action-btn danger" onclick="confirmClear()" id="btn-clear">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+          Tout supprimer
+        </button>
+        <div class="confirm-row" id="confirm-row" style="display:none">
+          <button class="confirm-yes" onclick="clearAll()">Confirmer</button>
+          <button class="confirm-no" onclick="cancelClear()">Annuler</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Modal Email PDF -->
+<div class="modal-overlay" id="modal-email-pdf">
+  <div class="modal">
+    <div class="modal-title">📧 Envoyer le PDF par email</div>
+    <div class="modal-sub">Le PDF sera généré et joint à votre email</div>
+    <input type="email" id="email-recipient" placeholder="adresse@email.com" style="margin-bottom:8px">
+    <input type="text" id="email-subject" placeholder="Objet de l'email" style="margin-bottom:16px">
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeEmailModal()">Annuler</button>
+      <button class="modal-send" id="modal-send-btn" onclick="sendPDFEmail()">
+        <span id="modal-send-label">Envoyer</span>
+      </button>
+    </div>
+    <p style="font-size:10px;color:var(--muted);margin-top:12px;text-align:center">Sur mobile, le PDF est joint automatiquement. Sur ordinateur, il sera téléchargé pour être joint manuellement.</p>
+  </div>
+</div>
+
+<!-- MISSING ITEMS REPORT MODAL -->
+<div class="modal-overlay" id="modal-missing-report">
+  <div class="modal">
+    <div class="modal-title">📋 Articles non reçus</div>
+    <div class="modal-sub" id="missing-count-text"></div>
+    <div class="preview-box" style="margin-bottom:14px">
+      <div class="preview-text" id="missing-report-text"></div>
+    </div>
+    <div class="modal-actions" style="flex-wrap:wrap">
+      <button class="modal-cancel" onclick="closeMissingReport()">Fermer</button>
+      <button class="modal-send" onclick="copyMissingReport()">Copier</button>
+    </div>
+    <div class="modal-actions" style="margin-top:8px">
+      <button class="modal-download" onclick="downloadMissingPDF()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        Télécharger PDF
+      </button>
+      <button class="modal-send" style="background:#25d366" onclick="sendMissingWhatsApp()">WhatsApp</button>
+      <button class="modal-send" onclick="sendMissingEmail()">Email magasinier</button>
+    </div>
+  </div>
+</div>
+
+<!-- MULTI-CHANTIER EXPORT MODAL -->
+<div class="modal-overlay" id="modal-multi-export">
+  <div class="modal">
+    <div class="modal-title">📤 Export multi-chantiers</div>
+    <div class="modal-sub">Sélectionnez les chantiers à inclure dans le PDF consolidé</div>
+    <div id="multi-export-list" style="max-height:280px;overflow-y:auto;margin-bottom:14px"></div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeMultiExportModal()">Annuler</button>
+      <button class="modal-send" onclick="downloadMultiPDF()">Générer PDF</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- PDF EMAIL MODAL -->
+<div class="modal-overlay" id="pdf-modal" onclick="closePdfModal(event)">
+  <div class="modal">
+    <div class="modal-title">&#128196; Générer le PDF</div>
+    <div class="modal-sub">Téléchargez le PDF ou envoyez-le directement par email</div>
+    <input type="email" id="email-to" placeholder="Adresse email du destinataire" style="margin-bottom:8px">
+    <input type="text" id="email-subject" placeholder="Objet du mail" style="margin-bottom:0">
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closePdfModalDirect()">Annuler</button>
+      <button class="modal-download" onclick="downloadPdf()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Télécharger PDF
+      </button>
+      <button class="modal-send" id="send-email-btn" onclick="sendPdfEmail()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Envoyer
+      </button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const NETWORKS = [
+  // --- Tuyauteries & raccords ---
+  {id:'cuivre_frigo',    name:'Cuivre Frigo',       icon:'🔴', desc:'Liaisons frigo & raccords cuivre'},
+  {id:'cuivre_tube',     name:'Cuivre Tube',         icon:'🟤', desc:'Tubes cuivre écroui barre 5m'},
+  {id:'per',             name:'PER',                 icon:'🟠', desc:'Tubes PER prégainé bleu & rouge'},
+  {id:'multicouche',     name:'Multicouche',         icon:'🔵', desc:'Tubes & raccords Fluxo à sertir'},
+  {id:'inox_sertir',    name:'Inox à Sertir',        icon:'⭕', desc:'Tubes & raccords inox 304L/316L à sertir'},
+  {id:'acier_sertir',   name:'Acier à Sertir Megapress', icon:'⬜', desc:'Raccords Megapress & filetés galva acier'},
+  {id:'pvc_evac',       name:'PVC Évacuation Ø32-110',icon:'🟣', desc:'Coudes, culottes, tés, manchons PVC petit diamètre'},
+  {id:'pvc_gros',        name:'PVC Gros Diam.',      icon:'⚪', desc:'Raccords PVC Ø125 à 315mm'},
+  // --- Aéraulique & ventilation ---
+  {id:'gaines_cvc',     name:'Gaines CVC',          icon:'🟢', desc:'Gaines flexibles & spiralées'},
+  {id:'access_gaines',  name:'Accessoires Gaines',  icon:'⚙️', desc:'Coudes, tés, réductions, piquages'},
+  {id:'colliers_vmc',   name:'Colliers VMC',         icon:'🔗', desc:'Colliers gaines & ventilation'},
+  // --- Électricité ---
+  {id:'chemin_cables',  name:'Chemin de Câbles',     icon:'⬛', desc:'CDC, dalles P31, rails CSN'},
+  {id:'cables_elec',    name:'Câbles Électriques',   icon:'⚡', desc:'R2V, LIYCY blindé, IRL, ICTA'},
+  {id:'boites_elec',    name:'Boîtes & Connexions',  icon:'🔌', desc:'Plexo IP55, bornes WAGO'},
+  // --- Robinetterie, sanitaire & ECS ---
+  {id:'robinetterie',   name:'Robinetterie & Vannes', icon:'🟡', desc:'Vannes boisseau, sphère, papillon, TA, purgeurs'},
+  {id:'sanitaire',      name:'Sanitaire',            icon:'🚽', desc:'Kits WC suspendu, collecteurs, platines Robifix'},
+  {id:'chauffe_eau',    name:'Chauffe-eau ECS',      icon:'♨️', desc:'Chauffe-eau électriques Thermor'},
+  // --- Fixation & quincaillerie ---
+  {id:'fixations_rails',name:'Fixations & Rails',    icon:'🔧', desc:'Rails, consoles, pieds, supports'},
+  {id:'chevilles',      name:'Chevilles & Vis béton',icon:'🪛', desc:'Chevilles, goujons, vis béton'},
+  {id:'vis_boulonnerie',name:'Vis & Boulonnerie',    icon:'🔩', desc:'Vis autoperceuses, colliers, écrous'},
+  // --- Isolation & étanchéité ---
+  {id:'adhesifs_etancheite', name:'Adhésifs & Étanchéité', icon:'🧴', desc:'Rubans alu, mastics, silicone'},
+  {id:'colliers_isolants', name:'Colliers Isolants Pirflex', icon:'🟤', desc:'Colliers isolants Pirflex & Pirflam pour tuyauteries'},
+  // --- Équipements ---
+  {id:'pompes_relevage',name:'Pompes & Supports',    icon:'💧', desc:'Pompes de relevage, supports'},
+  // --- Outillage & consommables ---
+  {id:'brasure',        name:'Brasure & Soudure',    icon:'🔥', desc:'Baguettes, décapants, agrafeuse'},
+  {id:'outillage',      name:'Outillage',            icon:'🪚', desc:'Scies trépan, lames, forets'},
+  {id:'consommables',   name:'Consommables',         icon:'📦', desc:'Films, peintures, nettoyants'},
+];
+const MATERIALS = {
+
+  cuivre_frigo: {
+    'Liaisons frigo isolées doubles': [
+      {name:'Liaison frigo double M1 1/4-3/8 iso.8mm', diameters:['L20m','L50m']},
+      {name:'Liaison frigo double M1 1/4-1/2 iso.8mm', diameters:['L20m']},
+      {name:'Liaison frigo double M1 1/4-1/2 iso.10mm', diameters:['L50m']},
+      {name:'Liaison frigo double M1 1/4-3/8 iso.10mm', diameters:['L50m']},
+      {name:'Liaison frigo double M1 3/8-5/8 iso.10mm', diameters:['L20m']},
+    ],
+    'Liaisons frigo isolées simples': [
+      {name:'Liaison frigo simple M1 1/4 iso.10mm', diameters:['L30m','L50m']},
+      {name:'Liaison frigo simple M1 3/8 iso.10mm', diameters:['L30m','L50m']},
+      {name:'Liaison frigo simple M1 1/2 iso.10mm', diameters:['L30m','L50m']},
+      {name:'Liaison frigo simple M1 3/4 iso.10mm', diameters:['L20m']},
+      {name:'Liaison frigo simple M1 5/8 iso.10mm', diameters:['L30m','L50m']},
+      {name:'Liaison frigo simple M1 7/8 iso.10mm', diameters:['L20m']},
+    ],
+    'Barres de cuivre NF L4m ep.1mm': [
+      {name:'Barre cuivre NF L4m ep.1mm', diameters:['1/2','5/8','3/4','7/8','1"','1"1/8']},
+    ],
+    'Coudes cuivre FF 45': [
+      {name:'Coude cuivre FF 45', diameters:['1/4','3/8','1/2','5/8','3/4','7/8','1"','1"1/8']},
+    ],
+    'Coudes cuivre FF 90 grand rayon': [
+      {name:'Coude cuivre FF 90 grand rayon', diameters:['1/4','3/8','1/2','5/8','3/4','7/8','1"','1"1/8']},
+    ],
+    'Tes cuivre FF egaux': [
+      {name:'Te cuivre FF egal', diameters:['1/4','3/8','1/2','5/8','3/4','7/8','1"1/8']},
+    ],
+    'Tes cuivre FFF inegaux': [
+      {name:'Te cuivre FFF 3/8-3/8-1/4', diameters:['standard']},
+      {name:'Te cuivre FFF 3/8-3/8-1/2', diameters:['standard']},
+      {name:'Te cuivre FFF 3/8-3/8-5/8', diameters:['standard']},
+      {name:'Te cuivre FFF 1/2-3/8-1/2', diameters:['standard']},
+      {name:'Te cuivre FFF 1/2-1/2-1/4', diameters:['standard']},
+      {name:'Te cuivre FFF 1/2-1/2-3/8', diameters:['standard']},
+      {name:'Te cuivre FFF 5/8-3/8-1/2', diameters:['standard']},
+      {name:'Te cuivre FFF 5/8-1/2-5/8', diameters:['standard']},
+      {name:'Te cuivre FFF 5/8-5/8-1/2', diameters:['standard']},
+      {name:'Te cuivre FFF 5/8-5/8-3/4', diameters:['standard']},
+      {name:'Te cuivre FFF 5/8-5/8-7/8', diameters:['standard']},
+      {name:'Te cuivre FFF 5/8-5/8-1"1/8', diameters:['standard']},
+      {name:'Te cuivre FFF 7/8-5/8-5/8', diameters:['standard']},
+      {name:'Te cuivre FFF 7/8-7/8-5/8', diameters:['standard']},
+      {name:'Te cuivre FFF 7/8-7/8-1"1/8', diameters:['standard']},
+    ],
+    'Manchons cuivre FF': [
+      {name:'Manchon cuivre FF', diameters:['1/4','3/8','1/2','5/8','3/4','7/8','1"','1"1/8']},
+    ],
+    'Reductions cuivre FF': [
+      {name:'Reduction cuivre FF', diameters:['3/8-1/4','1/2-3/8','5/8-3/8','5/8-1/2','3/4-3/8','3/4-1/2','3/4-5/8','7/8-3/4','1"1/8-3/4']},
+    ],
+  },
+
+  cuivre_tube: {
+    'Tubes cuivre ecroui demi-dur barre 5m': [
+      {name:'Tube cuivre ecroui demi-dur barre 5m', diameters:['10x12','12x14','14x16','16x18','20x22','26x28','33x35','38x40']},
+    ],
+  },
+
+  per: {
+    'Tubes PER pregaine BLEU couronne': [
+      {name:'Tube PER pregaine bleu couronne 50m', diameters:['12','16','20','25']},
+      {name:'Tube PER pregaine bleu couronne 100m', diameters:['12','16']},
+    ],
+    'Tubes PER pregaine ROUGE couronne': [
+      {name:'Tube PER pregaine rouge couronne 50m', diameters:['12','16','20','25']},
+      {name:'Tube PER pregaine rouge couronne 100m', diameters:['12']},
+    ],
+  },
+
+  multicouche: {
+    'Tubes Fluxo nu barre 4m': [
+      {name:'Tube Fluxo nu barre 4m', diameters:['16','20','26','32']},
+    ],
+    'Tubes Fluxo nu barre 5m': [
+      {name:'Tube Fluxo nu barre 5m', diameters:['40','50','63','75']},
+    ],
+    'Tubes Fluxo nu couronne 50m': [
+      {name:'Tube Fluxo nu couronne 50m', diameters:['16','20','26','32']},
+    ],
+    'Tubes Fluxo nu couronne 100m': [
+      {name:'Tube Fluxo nu couronne 100m', diameters:['16','20']},
+    ],
+    'Tubes Fluxo fourreau BLEU couronne': [
+      {name:'Tube Fluxo fourreau bleu couronne 50m', diameters:['16']},
+      {name:'Tube Fluxo fourreau bleu couronne 100m', diameters:['16']},
+    ],
+    'Tubes Fluxo fourreau ROUGE couronne': [
+      {name:'Tube Fluxo fourreau rouge couronne 50m', diameters:['16','26']},
+      {name:'Tube Fluxo pre-fourreaute couronne 50m 20x2', diameters:['20']},
+    ],
+    'Tubes Fluxo pre-isoles 10mm couronne 50m': [
+      {name:'Tube Fluxo pre-isole 10mm couronne 50m', diameters:['16','20','26']},
+      {name:'Tube Fluxo pre-isole 10mm couronne 25m', diameters:['32']},
+    ],
+    'Coudes 90 a sertir laiton bague inox': [
+      {name:'Coude 90 a sertir laiton bague inox', diameters:['16','20','26','32','40','50','63','75']},
+    ],
+    'Coudes 90 femelle a visser 15/21': [
+      {name:'Coude 90 femelle a visser 15/21', diameters:['16','20','26','32']},
+    ],
+    'Coudes 90 male a visser 15/21': [
+      {name:'Coude 90 male a visser 15/21', diameters:['16','20','26','32']},
+    ],
+    'Coudes 90 femelle a visser 20/27': [
+      {name:'Coude 90 femelle a visser 20/27', diameters:['16','20','26','32']},
+    ],
+    'Coudes 90 male a visser 20/27': [
+      {name:'Coude 90 male a visser 20/27', diameters:['16','20','26','32']},
+    ],
+    'Coudes 90 femelle a visser 26/34': [
+      {name:'Coude 90 femelle a visser 26/34', diameters:['26','32']},
+    ],
+    'Coudes 90 male a visser 26/34': [
+      {name:'Coude 90 male a visser 26/34', diameters:['26','32']},
+    ],
+    'Coudes 45 a sertir': [
+      {name:'Coude 45 a sertir laiton bague inox', diameters:['26','32','40','50','63','75']},
+    ],
+    'Manchons egaux a sertir laiton bague inox': [
+      {name:'Manchon egal a sertir laiton bague inox', diameters:['16','20','26','32','40','50','63']},
+    ],
+    'Manchons reduits a sertir': [
+      {name:'Manchon reduit a sertir', diameters:['16/20','20/16','20/26','26/16','26/20','32/16','32/20','32/26','40/20','40/26','40/32','50/20','50/26','50/32','63/40','63/50','75/40','75/50','75/63']},
+    ],
+    'Manchons femelle fixe a visser 15/21': [
+      {name:'Manchon femelle fixe 15/21 a visser', diameters:['16','20','26','32']},
+    ],
+    'Manchons male fixe a visser 15/21': [
+      {name:'Manchon male fixe 15/21 a visser', diameters:['16','20','26']},
+    ],
+    'Manchons femelle fixe a visser 20/27': [
+      {name:'Manchon femelle fixe 20/27 a visser', diameters:['16','20','26','32']},
+    ],
+    'Manchons male fixe a visser 20/27': [
+      {name:'Manchon male fixe 20/27 a visser', diameters:['16','20','26','32']},
+    ],
+    'Manchons femelle fixe a visser 26/34': [
+      {name:'Manchon femelle fixe 26/34 a visser', diameters:['16','20','26','32']},
+    ],
+    'Manchons male fixe a visser 26/34': [
+      {name:'Manchon male fixe 26/34 a visser', diameters:['16','20','26','32']},
+    ],
+    'Manchons femelle fixe a visser 33/42': [
+      {name:'Manchon femelle fixe 33/42 a visser', diameters:['32']},
+    ],
+    'Manchons femelle fixe a visser 40x49': [
+      {name:'Manchon femelle fixe 40x49 a visser', diameters:['40','50']},
+    ],
+    'Manchons male fixe a visser 40x49': [
+      {name:'Manchon male fixe 40x49 a visser', diameters:['40']},
+    ],
+    'Manchons femelle fixe a visser 50x60': [
+      {name:'Manchon femelle fixe 50x60 a visser', diameters:['50','63']},
+    ],
+    'Manchons male fixe a visser 50x60': [
+      {name:'Manchon male fixe 50x60 a visser', diameters:['50','63']},
+    ],
+    'Manchons femelle fixe 63x2 a visser': [
+      {name:'Manchon femelle fixe 63x2 a visser', diameters:['63']},
+    ],
+    'Manchons male fixe 63x2 a visser': [
+      {name:'Manchon male fixe 63x2 a visser', diameters:['63']},
+    ],
+    'Manchons femelle tournante a visser 12/17': [
+      {name:'Manchon femelle tournante 12/17 a visser', diameters:['16']},
+    ],
+    'Manchons femelle tournante a visser 15/21': [
+      {name:'Manchon femelle tournante 15/21 a visser', diameters:['16','20']},
+    ],
+    'Manchons femelle tournante a visser 20/27': [
+      {name:'Manchon femelle tournante 20/27 a visser', diameters:['16','20','26']},
+    ],
+    'Manchons femelle tournante a visser 26/34': [
+      {name:'Manchon femelle tournante 26/34 a visser', diameters:['26','32']},
+    ],
+    'Manchons femelle tournante a visser 33/42': [
+      {name:'Manchon femelle tournante 33/42 a visser', diameters:['32']},
+    ],
+    'Manchons femelle tournante 40x49': [
+      {name:'Manchon femelle tournante 40x49 a visser', diameters:['40']},
+    ],
+    'Manchons femelle tournante 50x60': [
+      {name:'Manchon femelle tournante 50x60 a visser', diameters:['50']},
+    ],
+    'Ecrous tournants': [
+      {name:'Ecrou tournant 33x42', diameters:['standard']},
+      {name:'Ecrou tournant 40x49', diameters:['standard']},
+      {name:'Ecrou tournant 50x60', diameters:['standard']},
+    ],
+    'Manchons de transition Fluxo-cuivre': [
+      {name:'Manchon transition Fluxo-cuivre a souder O18 bague inox', diameters:['20']},
+      {name:'Manchon transition Fluxo-cuivre a souder O22 bague inox', diameters:['20']},
+      {name:'Manchon transition MLP 26-PER 25', diameters:['standard']},
+    ],
+    'Tes egaux a sertir laiton bague inox': [
+      {name:'Te egal a sertir laiton bague inox', diameters:['16','20','26','32','40','50','63','75']},
+    ],
+    'Tes reduits a sertir': [
+      {name:'Te reduit a sertir', diameters:['16/20/16','20/16/16','20/16/20','20/20/16','26/16/16','26/20/16','26/26/16','26/26/20','32/16/32','32/20/32','32/26/32','32/32/16','32/32/20','32/32/26','40/20/40','40/26/40','40/32/40','40/40/26','40/40/32','50/16/50','50/20/50','50/26/50','50/32/50','50/40/50','63/26/63','63/32/63','63/40/63','63/50/63','75/50/75']},
+    ],
+    'Tes femelle a visser 15/21': [
+      {name:'Te femelle a visser 15/21', diameters:['16','20','26','32']},
+    ],
+    'Tes male a visser 15/21': [
+      {name:'Te male a visser 15/21', diameters:['16','20']},
+    ],
+    'Tes femelle a visser 20/27': [
+      {name:'Te femelle a visser 20/27', diameters:['16','20','26','32','40','50']},
+    ],
+    'Tes male a visser 20/27': [
+      {name:'Te male a visser 20/27', diameters:['16','20','26','32','40']},
+    ],
+    'Tes femelle a visser 26/34': [
+      {name:'Te femelle a visser 26/34', diameters:['26','32']},
+    ],
+    'Tes male a visser 26/34': [
+      {name:'Te male a visser 26/34', diameters:['26','32']},
+    ],
+    'Tes femelle a visser 33/42': [
+      {name:'Te femelle a visser 33/42 D32', diameters:['standard']},
+    ],
+    'Tes femelle a visser 20/27 D40': [
+      {name:'Te femelle a visser 20/27 D40', diameters:['standard']},
+    ],
+    'Tes femelle a visser 20/27 D50': [
+      {name:'Te femelle a visser 20/27 D50', diameters:['standard']},
+    ],
+    'Tes femelle a visser 20/27 D63': [
+      {name:'Te femelle a visser 20/27 D63', diameters:['standard']},
+    ],
+    'Tes egaux 40x40': [
+      {name:'Te egal a sertir D40x40', diameters:['standard']},
+    ],
+    'Tes egaux 50x50': [
+      {name:'Te egal a sertir D50x50', diameters:['standard']},
+    ],
+    'Tes egaux 63x63': [
+      {name:'Te egal a sertir D63x63', diameters:['standard']},
+    ],
+    'Tes egaux 75': [
+      {name:'Te egal a sertir D75', diameters:['standard']},
+    ],
+    'Tes femelles a visser 26/34 D75': [
+      {name:'Tes femelles a visser 26/34 D75', diameters:['standard']},
+    ],
+    'Tes reduits D75': [
+      {name:'Te reduit a sertir D75/50/75', diameters:['standard']},
+    ],
+  },
+
+  pvc_gros: {
+    'Coudes MF 45': [
+      {name:'Coude PVC MF 45', diameters:['125','140','160','200','250','315']},
+    ],
+    'Coudes FF 45': [
+      {name:'Coude PVC FF 45', diameters:['125','140','160','200','250','315']},
+    ],
+    'Coudes MF 87-30': [
+      {name:'Coude PVC MF 87-30', diameters:['125','140','160','200','250','315']},
+    ],
+    'Coudes FF 87-30': [
+      {name:'Coude PVC FF 87-30', diameters:['125','140','160','200','250','315']},
+    ],
+    'Culottes simples MF 45': [
+      {name:'Culotte simple MF 45', diameters:['125','140','160','200','250','315']},
+    ],
+    'Culottes simples FF 45': [
+      {name:'Culotte simple FF 45', diameters:['125','140','160','200','250','315']},
+    ],
+    'Culottes simples MF 87-30': [
+      {name:'Culotte simple MF 87-30', diameters:['125','140','160','200','250','315']},
+    ],
+    'Culottes simples FF 87-30': [
+      {name:'Culotte simple FF 87-30', diameters:['125','140','160','200','250','315']},
+    ],
+    'Embranchements simples MF 45': [
+      {name:'Embranchement simple MF 45', diameters:['140/100','140/125','160/100','160/125','160/140','200/100','200/125','200/140','200/160']},
+    ],
+    'Embranchements simples FF 45': [
+      {name:'Embranchement simple FF 45', diameters:['160/100','160/125','160/140','200/100','200/125','200/140','200/160']},
+    ],
+    'Manchons FF': [
+      {name:'Manchon FF', diameters:['125','140','160','200']},
+    ],
+    'Manchons dilatation': [
+      {name:'Manchon dilatation simple', diameters:['125']},
+      {name:'Manchon dilatation horizontal', diameters:['125','140','160','200']},
+    ],
+    'Manchons a butee FF': [
+      {name:'Manchon a butee FF', diameters:['250','315']},
+    ],
+    'Manchon FF collerette gorge': [
+      {name:'Manchon FF collerette gorge', diameters:['250']},
+    ],
+    'Reductions excentriques MF': [
+      {name:'Reduction excentree MF', diameters:['125/100','140/100','140/125','160/100','160/125','160/140','200/125','200/140','200/160']},
+    ],
+    'Reductions exterieures excentriques MF': [
+      {name:'Reduction exterieure excentree MF', diameters:['250/100','250/125','250/160','250/200','315/160','315/200','315/250']},
+    ],
+    'Tampons de reduction': [
+      {name:'Tampon de reduction', diameters:['125/100']},
+    ],
+    'Tampons de visite': [
+      {name:'Tampon de visite', diameters:['125','140','160','200']},
+    ],
+  },
+
+
+  gaines_cvc: {
+    'Gaines flexibles nues M0 Aluflex L10ml': [
+      {name:'Aluflex nu M0 L10ml', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Gaines flexibles isolees M0/M1 Sonoflex L10ml': [
+      {name:'Sonoflex isolee M0/M1 L10ml', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Gaines semi-rigides galva Meflex L3ml': [
+      {name:'Meflex semi-rigide galva L3ml', diameters:['80','100','125','160','200','250','315','355','400','450','500']},
+    ],
+    'Gaines semi-rigides alu Semiflex L3ml': [
+      {name:'Semiflex semi-rigide alu L3ml', diameters:['80','100','125','160','200','250','315','355','400','450','500','630']},
+    ],
+    'Conduits vinyl PVCflex L6ml': [
+      {name:'PVCflex nu L6ml', diameters:['80','125','160']},
+      {name:'PVCflex isole L6ml', diameters:['80','125','160']},
+    ],
+    'Gaines circulaires spiralees GS galva': [
+      {name:'Gaine spiralee GS galva L2470', diameters:['80','125','160','200','250','315','355','400','450','500','560','630']},
+      {name:'Gaine spiralee GS galva L3000', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+  },
+
+  access_gaines: {
+    'Coudes 45 galva': [
+      {name:'Coude 45 galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Coudes 90 galva': [
+      {name:'Coude 90 galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Tes egaux galva': [
+      {name:'Te egal galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Reductions coniques galva': [
+      {name:'Reduction conique galva', diameters:['160/125','200/125','200/160','250/125','250/160','250/200','315/125','315/160','315/200','315/250','355/200','355/250','355/315','400/200','400/250','400/315','400/355','450/315','450/355','450/400','500/315','500/400','500/450','560/450','560/500','630/500','630/560']},
+    ],
+    'Piquages sur gaine PEC galva': [
+      {name:'Piquage sur gaine PEC galva', diameters:['80/80','80/100','80/125','100/100','100/125','125/125','125/160','125/200','125/250','125/315','160/160','160/200','160/250','160/315','200/200','200/250','200/315','250/250','250/315','315/315','315/355','315/400','355/355','355/400','400/400','400/450','450/450','450/500']},
+    ],
+    'Piquages plats PEP galva': [
+      {name:'Piquage plat PEP galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Raccords flexibles RF galva': [
+      {name:'Raccord flexible RF galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Manchons RM galva': [
+      {name:'Manchon raccordement RM galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Registres circulaires RPL galva': [
+      {name:'Registre circulaire RPL galva', diameters:['125','160','200','250','315','355','400','450','500']},
+    ],
+    'Silencieux SAR galva': [
+      {name:'Silencieux SAR galva L600', diameters:['125','160','200','250','315','355','400']},
+      {name:'Silencieux SAR galva L900', diameters:['450','500']},
+    ],
+    'Manchettes souples DAD galva': [
+      {name:'Manchette souple DAD galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Bagues de jonction BG galva': [
+      {name:'Bague jonction BG galva', diameters:['125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Brides BP / BPP galva': [
+      {name:'Bride plate BP galva', diameters:['80','100','125','160','200','250','315','355','400','450','500','560','630']},
+      {name:'Bride a patte BPP galva', diameters:['100','125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+    'Supports SG / Colliers centrage CCG': [
+      {name:'Support galva SG', diameters:['125','160','200','250','315','355','400','450','500','560','630']},
+      {name:'Collier centrage CCG galva', diameters:['200','315','355','400','450','500','560','630']},
+    ],
+    'Fourreaux de traversee FT galva L750': [
+      {name:'Fourreau traversee FT galva L750', diameters:['125','160','200','250','315','355','400','450','500','560','630']},
+    ],
+  },
+
+  colliers_vmc: {
+    'Colliers serrage gaine souple inox MCA': [
+      {name:'Collier serrage MCA inox 430', diameters:['60-110mm','60-165mm','60-325mm']},
+    ],
+    'Colliers serrage Monofil galva': [
+      {name:'Collier Monofil galva', diameters:['O80','O100','O125','O160','O200','O250','O315','O355','O400','O560','O630']},
+    ],
+    'Colliers ventilation OBMC SX413 galva': [
+      {name:'Collier ventilation OBMC SX413 galva', diameters:['O100','O125','O160','O200','O250','O315','O355','O400','O450','O500','O560','O630']},
+    ],
+  },
+
+  chemin_cables: {
+    'Chemins de cables fil BS 3M': [
+      {name:'CF 30 fil BS 3M', diameters:['100','150','200','300']},
+      {name:'CF 54 fil BS 3M', diameters:['150','200','300','400']},
+    ],
+    'Couvercles fil CP 2M': [
+      {name:'Couvercle fil CP 2M', diameters:['100','150','200','300','400']},
+    ],
+    'Clip F02': [
+      {name:'Clip F02', diameters:['standard']},
+    ],
+    'Dalles P31 auto 3M': [
+      {name:'Dalle P31 M/F 50x auto 3M', diameters:['100','150','200']},
+      {name:'Dalle P31 embouti M/F 50x200 auto 3M', diameters:['standard']},
+    ],
+    'Eclisses P31': [
+      {name:'Eclisse universelle EDU H50', diameters:['standard']},
+      {name:'Eclisse CE40', diameters:['standard']},
+    ],
+    'Rails & Couvercles P31': [
+      {name:'Rail 41x41-2.5 S 3000', diameters:['standard']},
+      {name:'Rail CSN 3000', diameters:['standard']},
+      {name:'Couvercle CO L3M', diameters:['100','150','200']},
+    ],
+    'Consoles CL': [
+      {name:'Console CL', diameters:['150','200','300','350']},
+    ],
+  },
+
+  cables_elec: {
+    'Cables R2V cuivre L50m': [
+      {name:'R2V CU 3G L50m', diameters:['1.5','2.5','4']},
+      {name:'R2V CU 4G L50m', diameters:['1.5','2.5']},
+      {name:'R2V CU 5G L50m', diameters:['1.5']},
+    ],
+    'Cables blindes LIYCY': [
+      {name:'LIYCY 2x0,75 blinde C L100m', diameters:['standard']},
+      {name:'LIYCY 2x0,75 blinde T L500m', diameters:['standard']},
+      {name:'LIYCY 2x1,5 blinde T5 L500m', diameters:['standard']},
+    ],
+    'Tubes IRL au metre': [
+      {name:'IRL 3321 C+ tube au metre', diameters:['D16','D20','D25']},
+    ],
+    'Tubes ICTA au metre': [
+      {name:'ICTA 3422 C+ ATF Classic+ au metre', diameters:['D16','D20']},
+    ],
+    'Colliers cables': [
+      {name:'Collier Origin nylon', diameters:['292x3.6 BLC','292x3.6 NR']},
+    ],
+  },
+
+  boites_elec: {
+    'Boites Plexo IP55': [
+      {name:'Boite Optibox IP55', diameters:['80x80x42','100x100x52']},
+    ],
+    'Bornes WAGO 221 GREEN': [
+      {name:'Borne WAGO 221 2x4mm2 leviers', diameters:['centaine']},
+      {name:'Borne WAGO 221 3x4mm2 leviers', diameters:['centaine']},
+    ],
+    'Mini bornes WAGO a levier': [
+      {name:'Mini borne WAGO 2E', diameters:['centaine']},
+      {name:'Mini borne WAGO 3E', diameters:['centaine']},
+      {name:'Mini borne WAGO 4E', diameters:['centaine']},
+      {name:'Mini borne WAGO 5E', diameters:['centaine']},
+      {name:'Mini borne WAGO 8E', diameters:['centaine']},
+    ],
+  },
+
+  fixations_rails: {
+    'Rails & Profiles': [
+      {name:'Profil RP2 41x21 ep.2mm LG3m', diameters:['standard']},
+      {name:'Profil RP4 41x41 ep.2mm LG3m', diameters:['standard']},
+      {name:'Rail 41x21', diameters:['LG3m','LG6m']},
+      {name:'Rail 41x41', diameters:['LG3m','LG6m']},
+    ],
+    'Ecrous rail premonte ERP': [
+      {name:'Ecrou rail premonte ERP M8', diameters:['x30','x50']},
+      {name:'Ecrou rail premonte ERP M10', diameters:['x40','x50']},
+    ],
+    'Consoles KP4 41x41': [
+      {name:'Console KP4 41x41', diameters:['LG600mm','LG750mm']},
+    ],
+    'Consoles U plafond serie W H170': [
+      {name:'Console U plafond serie W H170', diameters:['LG100','LG150','LG200','LG300','LG400','LG500']},
+    ],
+    'Equerre & Bouchons': [
+      {name:'Equerre 41x41 4 trous 86x102mm', diameters:['standard']},
+      {name:'Bouchon extremite 41x21 BP2 noir', diameters:['centaine']},
+      {name:'Bouchon extremite 41x41 BP4 noir', diameters:['centaine']},
+    ],
+    'Tete bascule & Verrou': [
+      {name:'Tete bascule O8', diameters:['centaine']},
+      {name:'Verrou Fastlok N2 50kg', diameters:['centaine']},
+    ],
+    'Supports Rubbas': [
+      {name:'Support Rubbas', diameters:['400mm','600mm']},
+    ],
+    'Pieds Rubber caoutchouc': [
+      {name:'Mini pied Rubber 250x130x50mm', diameters:['standard']},
+      {name:'Pied Rubber 450x180x95mm', diameters:['standard']},
+      {name:'Pied Rubber 600x180x95mm', diameters:['standard']},
+      {name:'Pied Rubber 1000x180x95mm', diameters:['standard']},
+    ],
+    'Supports sol & Pieds carres': [
+      {name:'Support carre Rubleg 350x350mm', diameters:['standard']},
+      {name:'Kit support clim laque beige S-263P 550x400mm 160kg', diameters:['standard']},
+    ],
+    'Bande perforee AG': [
+      {name:'Bande perforee AG', diameters:['17mmx25m','25mmx25m']},
+    ],
+    'Patte a vis': [
+      {name:'Patte a vis metaux O6x40 M7x150', diameters:['centaine']},
+    ],
+    'Rails strut perfores GS': [
+      {name:'Rail strut perfore GS 41x21x2mm', diameters:['LG3m','LG6m']},
+      {name:'Rail strut perfore GS 41x41x2mm', diameters:['LG3m','LG6m']},
+    ],
+  },
+
+  chevilles: {
+    'Chevilles Grippon': [
+      {name:'Cheville Grippon Blanc O6 sachet 100', diameters:['standard']},
+      {name:'Cheville Grippon Marron O8 sachet 100', diameters:['standard']},
+    ],
+    'Chevilles Aggrip': [
+      {name:'Cheville Aggrip Grise O10 sachet', diameters:['standard']},
+    ],
+    'Chevilles MEX': [
+      {name:'Cheville MEX O6x52/58', diameters:['avec vis','sans vis']},
+    ],
+    'Chevilles placo': [
+      {name:'Cheville placo metal + vis O12x35', diameters:['standard']},
+    ],
+    'Chevilles suspente': [
+      {name:'Cheville suspente Rapid O8x30', diameters:['centaine']},
+    ],
+    'Goujons ancrage premonte AZ': [
+      {name:'Goujon ancrage premonte AZ O8', diameters:['x75','x90','x115']},
+      {name:'Goujon ancrage premonte AZ O10x90', diameters:['centaine']},
+    ],
+    'Vis beton': [
+      {name:'Vis beton tete femelle AG M8x35', diameters:['centaine']},
+      {name:'Vis beton tete male AG M8x35', diameters:['centaine']},
+      {name:'Vis beton TT M8/M10 D6x35 boite 50', diameters:['standard']},
+      {name:'Piton femelle beton zingue GETO M8/10 D6mmx35mm boite 50', diameters:['standard']},
+    ],
+  },
+
+  vis_boulonnerie: {
+    'Vis autoperceuses': [
+      {name:'Vis autoperceuse T.HEX AZ O4.2x16', diameters:['centaine']},
+      {name:'Vis autoperceuse T.Bombee AZ carre O4.2x16', diameters:['centaine']},
+      {name:'Vis autoperceuse Hilti S-MS01Z 4,8x20', diameters:['millier']},
+    ],
+    'Vis a oeil': [
+      {name:'Vis a oeil AZ M8x25', diameters:['centaine']},
+    ],
+    'Ecrous & Rondelles': [
+      {name:'Ecrou 6 pans AZ O8', diameters:['centaine']},
+    ],
+    'Colliers sans fin Serflex': [
+      {name:'Collier sans fin AZ', diameters:['O10-16','O12-22','O16-27','O20-32','O25-40']},
+    ],
+    'Colliers Tubafix': [
+      {name:'Collier Tubafix O8-32mm', diameters:['centaine']},
+    ],
+    'Pince de serrage VMC': [
+      {name:'Pince de serrage pour cadre VMC', diameters:['centaine']},
+    ],
+    'Boulons & vis zinguees classe 6.8 (boite 25)': [
+      {name:'Boulon zingue (vis+ecrou) classe 6.8', diameters:['12x50','16x40','16x45','16x50','16x60','16x70','20x70','20x80']},
+      {name:'Vis zinguee classe 6.8', diameters:['16x30','16x35','16x40','16x45','16x50','16x60','20x40','20x45 (8.8)','20x50','20x55','20x60','20x65']},
+    ],
+  },
+
+  outillage: {
+    'Scies trepan T3 Kopram': [
+      {name:'Scie trepan T3 12L 19mm', diameters:['standard']},
+      {name:'Scie trepan T3 14L 22mm', diameters:['standard']},
+      {name:'Scie trepan T3 16L 25mm', diameters:['standard']},
+      {name:'Scie trepan T3 18L 29mm', diameters:['standard']},
+      {name:'Scie trepan T3 19L 30mm', diameters:['standard']},
+      {name:'Scie trepan T3 20L 32mm', diameters:['standard']},
+      {name:'Scie trepan T3 22L 35mm', diameters:['standard']},
+      {name:'Scie trepan T3 24L 38mm', diameters:['standard']},
+      {name:'Scie trepan T3 26L 41mm', diameters:['standard']},
+      {name:'Scie trepan T3 28L 44mm', diameters:['standard']},
+      {name:'Scie trepan T3 30L 48mm', diameters:['standard']},
+      {name:'Scie trepan T3 32L 51mm', diameters:['standard']},
+      {name:'Scie trepan T3 34L 54mm', diameters:['standard']},
+      {name:'Scie trepan T3 36L 57mm', diameters:['standard']},
+      {name:'Scie trepan T3 38L 60mm', diameters:['standard']},
+      {name:'Scie trepan T3 40L 64mm', diameters:['standard']},
+      {name:'Scie trepan T3 41L 65mm', diameters:['standard']},
+      {name:'Scie trepan T3 42L 67mm', diameters:['standard']},
+      {name:'Scie trepan T3 43L 68mm', diameters:['standard']},
+      {name:'Scie trepan T3 44L 70mm', diameters:['standard']},
+      {name:'Scie trepan T3 48L 76mm', diameters:['standard']},
+      {name:'Scie trepan T3 52L 83mm', diameters:['standard']},
+      {name:'Scie trepan T3 54L 86mm', diameters:['standard']},
+      {name:'Scie trepan T3 64L 102mm', diameters:['standard']},
+      {name:'Scie trepan T3 66L 105mm', diameters:['standard']},
+      {name:'Scie trepan T3 70L 111mm', diameters:['standard']},
+      {name:'Scie trepan T3 80L 127mm', diameters:['standard']},
+      {name:'Scie trepan T3 96L 152mm', diameters:['standard']},
+    ],
+    'Trepans bimetal ERKO': [
+      {name:'Trepan bimetal ERKO', diameters:['D160mm','D210mm']},
+    ],
+    'Arbres pour trepan': [
+      {name:'Arbre pour trepan 14-30mm', diameters:['standard']},
+      {name:'Arbre pour trepan 32-210mm', diameters:['standard']},
+    ],
+    'Forets': [
+      {name:'Foret pilote carbure EZC 47012', diameters:['standard']},
+    ],
+    'Lames scie sabre Milwaukee Torch Ice Edge x5': [
+      {name:'Lame scie sabre Torch Ice Edge (x5)', diameters:['150mm','230mm']},
+    ],
+    'Disques a tronconner': [
+      {name:'Disque tronconner metaux IMA Evolution', diameters:['O125x1.6']},
+    ],
+  },
+
+  brasure: {
+    'Baguettes de brasure': [
+      {name:'Baguette brasure Phosbraz O2', diameters:['5kg']},
+      {name:'Baguette brasure 6% argent PAG60', diameters:['1kg']},
+      {name:'Baguette brasure cuivre enrobee Cobrox O3', diameters:['5kg']},
+    ],
+    'Decapant': [
+      {name:'Decapant poudre Castolin 800', diameters:['200g']},
+    ],
+    'Accessoires brasure': [
+      {name:'Agrafeuse Bostich T6-8OC2 tete moustache', diameters:['standard']},
+      {name:'Manchon Kaiflex ST O28 ep.019', diameters:['ml']},
+      {name:'Spatule de marouflage', diameters:['standard']},
+    ],
+  },
+
+  adhesifs_etancheite: {
+    'Rubans adhesifs': [
+      {name:'Ruban adhesif alu-butyl ASB M1 15ml L50mm', diameters:['RL']},
+      {name:'Ruban adhesif PE-butyl PSB 15ml L50mm', diameters:['RL']},
+      {name:'Adhesif isolation alu ECAP 50x50mm 30 microns', diameters:['standard']},
+      {name:'Adhesif isolation alu ECAP 50x100mm 40 microns', diameters:['standard']},
+      {name:'Adhesif gris toile 33x100mm', diameters:['standard']},
+      {name:'Bande adhesive Armaflex isolante 15mx50mm', diameters:['standard']},
+      {name:'Bande etancheite butyle Trackbande 10mx75mm', diameters:['standard']},
+      {name:'Bande isolante traversee de mur ep.3mm 25mx330mm', diameters:['standard']},
+    ],
+    'Mastics': [
+      {name:'Mastic acrylique M1 Eocryl B pot 6kg', diameters:['standard']},
+      {name:'Mastic acrylique M1 Eocryl W cartouche 280ml', diameters:['standard']},
+      {name:'Mastic acrylique M1 VMCacryl', diameters:['standard']},
+      {name:'Mastic polyurethane HM Gepur gris', diameters:['standard']},
+      {name:'Silicone neutre oxime gris Gesil 300ml', diameters:['standard']},
+    ],
+    'Griffes serre-cadre': [
+      {name:'Griffe rapide serre-cadre acier galvanise SKC boite 200', diameters:['standard']},
+    ],
+    'Pinceaux': [
+      {name:'Pinceau 40mm manche bois', diameters:['standard']},
+      {name:'Pinceau queue de morue 36mm', diameters:['standard']},
+    ],
+  },
+
+  pompes_relevage: {
+    'Pompes de relevage': [
+      {name:'Pompe bi-bloc Si-20', diameters:['standard']},
+      {name:'Pompe bi-bloc Si-30', diameters:['standard']},
+      {name:'Pompe bi-blocs SI-33 30L/H piston oscillant', diameters:['standard']},
+      {name:'Pompe relevage Delta pack 80x60 blanc RAL9003', diameters:['standard']},
+      {name:'Pompe relevage piston oscillant detection integree 20l/h', diameters:['standard']},
+    ],
+    'Supports muraux pompes': [
+      {name:'Support mural barre et niveau 70kg/bras', diameters:['465x375x800mm','550x375x800mm']},
+    ],
+    'Supports sol groupes exterieurs': [
+      {name:'Support sol ALTECH 280kg lot 2', diameters:['L450mm']},
+      {name:'Support sol ALTECH 450kg lot 2', diameters:['L600mm']},
+      {name:'Support sol caoutchouc SUMO 1000mm', diameters:['standard']},
+    ],
+    'Inter-sectionneurs Isolator': [
+      {name:'Inter-sectionneur Isolator 3P', diameters:['20A','32A','40A']},
+      {name:'Inter-sectionneur Isolator 4P', diameters:['20A','32A','40A']},
+    ],
+    'Plots anti-vibratiles': [
+      {name:'Plaque Gripsol support amortisseur caoutchouc ep.11mm', diameters:['500x500mm']},
+    ],
+  },
+
+  consommables: {
+    'Films polyethylene': [
+      {name:'Film polyethylene PF T150 75m2 largeur 3m', diameters:['standard']},
+      {name:'Film polyethylene PF T150 165m2 largeur 3m', diameters:['standard']},
+    ],
+    'Peinture antirouille': [
+      {name:'Peinture antirouille rouge AR606 RAL3000 5L', diameters:['standard']},
+    ],
+    'Mousses & Nettoyants': [
+      {name:'Mousse nettoyante multisurface 500ml', diameters:['standard']},
+    ],
+    'Divers chantier': [
+      {name:'Traceur chantier fluo orange Soppec', diameters:['standard']},
+    ],
+  },
+
+  inox_sertir: {
+    'Tubes inox a sertir 304L barre 6m': [
+      {name:'Tube inox a sertir 304L barre 6m', diameters:['15x1','18x1','22x1.2','28x1.2','35x1.5','42x1.5','54x1.5']},
+    ],
+    'Tubes inox 316L barre 6m': [
+      {name:'Tube inox 316L barre 6m', diameters:['15x1','18x1','22x1.2','28x1.2','35x1.5','42x1.5','54x1.5']},
+    ],
+    'Coudes F-F 45 Inoxpres a sertir': [
+      {name:'Coude F/F 45 Inoxpres a sertir', diameters:['15','18','22','28','35','42','54']},
+    ],
+    'Coudes M-F 45 Inoxpres a sertir': [
+      {name:'Coude M/F 45 Inoxpres a sertir', diameters:['15','18','22','28','35','42','54']},
+    ],
+    'Coudes F-F 90 Inoxpres a sertir': [
+      {name:'Coude F/F 90 Inoxpres a sertir', diameters:['15','18','22','28','35','42','54']},
+    ],
+    'Coudes M-F 90 Inoxpres a sertir': [
+      {name:'Coude M/F 90 Inoxpres a sertir', diameters:['15','18','22','28','35','42','54']},
+    ],
+    'Manchons Inoxpres a sertir': [
+      {name:'Manchon Inoxpres a sertir', diameters:['15','18','22','28','35','42','54']},
+    ],
+    'Raccords ecrou libre Inoxpres': [
+      {name:'Raccord ecrou libre Inoxpres', diameters:['15x1/2','18x1/2','18x3/4','22x3/4','22x1P','28x1P','28x1P1/4','35x1P1/4','42x1P1/2','54x2P']},
+    ],
+    'Raccords fil femelle Inoxpres': [
+      {name:'Raccord fil femelle Inoxpres', diameters:['15x1/2','18x1/2','18x3/4','22x1/2','22x3/4','22x1P','28x1P','35x1P','35x1P1/4','42x1P1/2','54x2P']},
+    ],
+    'Raccords fil male Inoxpres': [
+      {name:'Raccord fil male Inoxpres', diameters:['15x1/2','18x1/2','18x3/4','22x1/2','22x3/4','22x1P','28x3/4','28x1P','35x1P','35x1P1/4','42x1P1/4','42x1P1/2','54x1P1/2','54x2P']},
+    ],
+    'Raccords union fil male Inoxpres': [
+      {name:'Raccord union fil male Inoxpres', diameters:['15x3/4','18x1/2','22x1/2','22x3/4','22x1P','28x1P','35x1P1/4','42x1P1/2','54x2P']},
+    ],
+    'Raccords union taraude femelle Inoxpres': [
+      {name:'Raccord union taraude F Inoxpres', diameters:['15x1/2','18x3/4','22x3/4','28x1P','35x1P1/4','54x2P']},
+    ],
+    'Reductions M-F Inoxpres': [
+      {name:'Reduction M/F Inoxpres', diameters:['18x15','22x15','22x18','28x18','28x22','35x18','35x22','35x28','42x18','42x22','42x28','42x35','54x22','54x28','54x35','54x42']},
+    ],
+    'Tes egaux Inoxpres': [
+      {name:'Te egal Inoxpres', diameters:['15','18','22','28','35','42','54']},
+    ],
+    'Tes mixtes fil femelle Inoxpres': [
+      {name:'Te mixte fil F Inoxpres', diameters:['15x1/2x15','18x1/2x18','22x1/2x22','28x3/4x28','35x3/4x35','42x1/2x42','42x3/4x42','54x1/2x54','54x2Px54']},
+    ],
+    'Tes reduits Inoxpres': [
+      {name:'Te reduit Inoxpres', diameters:['22x15x22','22x18x22','28x15x28','28x18x28','28x22x28','35x15x35','35x18x35','35x22x35','35x28x35','42x22x42','42x35x42','54x18x54','54x22x54','54x28x54','54x42x54']},
+    ],
+  },
+
+  pvc_evac: {
+    'Coudes PVC 20-30': [
+      {name:'Coude PVC MF 20', diameters:['100']},
+      {name:'Coude PVC FF 20', diameters:['100']},
+      {name:'Coude PVC MF 30', diameters:['100']},
+      {name:'Coude PVC FF 30', diameters:['100']},
+    ],
+    'Coudes PVC 45 MF': [
+      {name:'Coude PVC MF 45', diameters:['32','40','50','75','80','100']},
+    ],
+    'Coudes PVC 45 FF': [
+      {name:'Coude PVC FF 45', diameters:['32','40','50','75','80','100']},
+    ],
+    'Coudes PVC 67': [
+      {name:'Coude PVC MF 67', diameters:['40','100']},
+      {name:'Coude PVC FF 67', diameters:['40','100']},
+    ],
+    'Coudes PVC 87 MF': [
+      {name:'Coude PVC MF 87', diameters:['32','40','50','75','80','100']},
+    ],
+    'Coudes PVC 87 FF': [
+      {name:'Coude PVC FF 87', diameters:['32','40','50','75','80','100']},
+    ],
+    'Secteurs de coude PVC': [
+      {name:'Secteur de coude 15', diameters:['100']},
+      {name:'Secteur de coude 30', diameters:['100']},
+    ],
+    'Culottes simples PVC 45': [
+      {name:'Culotte simple PVC 45 MF', diameters:['32','40','50','75','80','100','100/40','100/50']},
+      {name:'Culotte simple PVC 45 FF', diameters:['32','40','50','75','80','100']},
+    ],
+    'Culottes simples PVC 67': [
+      {name:'Culotte simple PVC 67 MF', diameters:['100','100/50']},
+    ],
+    'Culottes simples PVC 87': [
+      {name:'Culotte simple PVC 87 MF', diameters:['75','80','100','100/40','100/50']},
+      {name:'Culotte simple PVC 87 FF', diameters:['75','80','100']},
+    ],
+    'Tes pied de biche PVC 87': [
+      {name:'Te pied de biche 87 MF', diameters:['32','40','50']},
+      {name:'Te pied de biche 87 FF', diameters:['32','40','50']},
+    ],
+    'Culottes doubles paralleles PVC D100': [
+      {name:'Culotte double parallele PVC 45 MF', diameters:['100']},
+      {name:'Culotte double parallele PVC 45 FF', diameters:['100']},
+      {name:'Culotte double parallele PVC 87 MF', diameters:['100']},
+      {name:'Culotte double parallele PVC 87 FF', diameters:['100']},
+    ],
+    'Culottes doubles equerre PVC D100': [
+      {name:'Culotte double equerre PVC 45 MF', diameters:['100']},
+      {name:'Culotte double equerre PVC 45 FF', diameters:['100']},
+      {name:'Culotte double equerre PVC 87 MF', diameters:['100']},
+      {name:'Culotte double equerre PVC 87 FF', diameters:['100']},
+    ],
+    'Culottes joint dilatation systeme J PVC D100': [
+      {name:'Culotte simple joint dilat. 45 systeme J', diameters:['100']},
+      {name:'Culotte simple 67 MF systeme J', diameters:['100']},
+      {name:'Culotte simple joint dilat. 87.30 systeme J', diameters:['100']},
+      {name:'Culotte double joint dilat. 67 systeme J', diameters:['100']},
+      {name:'Culotte double joint dilat. 87.30 systeme J', diameters:['100']},
+    ],
+    'Manchons de dilatation PVC': [
+      {name:'Manchon dilatation simple', diameters:['100']},
+      {name:'Manchon dilatation horizontal', diameters:['40','100']},
+    ],
+    'Manchons PVC FF': [
+      {name:'Manchon PVC FF', diameters:['32','40','50','75','80','100','110']},
+    ],
+    'Reductions incorporees PVC MF': [
+      {name:'Reduction incorporee PVC MF', diameters:['40x32','50x32','50x40']},
+    ],
+    'Tampons de reduction PVC': [
+      {name:'Tampon reduction simple', diameters:['100x32','100x40','100x50','110x100']},
+      {name:'Tampon reduction double', diameters:['100x40x40']},
+      {name:'Tampon reduction male', diameters:['93/40','93/50','93/40/40']},
+      {name:'Tampon reduction D118 male-100 fem', diameters:['standard']},
+    ],
+    'Manchettes de reparation PVC': [
+      {name:'Manchette reparation male', diameters:['100/93','D125']},
+    ],
+    'Tampons de visite PVC': [
+      {name:'Tampon de visite PVC', diameters:['32','40','50','75','80','100','110']},
+    ],
+  },
+
+  robinetterie: {
+    'Vannes a boisseau spherique ACS FF poignee plate serie 580': [
+      {name:'Vanne BS ACS FF poignee plate RGE serie 580', diameters:['3/8','1/2','3/4','1"','1"1/4','1"1/2','2"']},
+    ],
+    'Vannes a boisseau spherique ACS MF poignee plate serie 581': [
+      {name:'Vanne BS ACS MF poignee plate RGE serie 581', diameters:['3/8','1/2','3/4','1"','1"1/4','1"1/2','2"']},
+    ],
+    'Vannes a sphere laiton 615 prolongateur fixe': [
+      {name:'Vanne a sphere laiton 615 prolongateur fixe', diameters:['1/2','3/4','1"','1"1/4','1"1/2','2"']},
+    ],
+    'Vannes sphere ACS prolongateur MF poignee RGE': [
+      {name:'Vanne sphere ACS prolongateur MF poignee RGE', diameters:['1/2','3/4','1"','1"1/4','1"1/2','2"']},
+    ],
+    'Vannes papillon PAP fonte GS levier': [
+      {name:'Vanne PAP OT CL623T fonte GS levier', diameters:['DN40','DN50','DN65','DN80','DN100','DN125','DN150']},
+    ],
+    'Vannes TA equilibrage STAD IMI Hydronic PN25': [
+      {name:'Vanne STAD PN25 IMI Hydronic', diameters:['DN10','DN15','DN20','DN25','DN32','DN40','DN50']},
+    ],
+    'Vannes TA equilibrage STAF IMI Hydronic PN16': [
+      {name:'Vanne STAF PN16 IMI Hydronic', diameters:['DN65','DN80','DN100','DN150']},
+    ],
+    'Purgeurs': [
+      {name:'Purgeur ZUPN DN15 IMI Hydronic', diameters:['standard']},
+      {name:'Purgeur coude Aercal PA15 Thermador', diameters:['1/2']},
+      {name:'Purgeur coude Flexvent H Nickele Flamco', diameters:['1/2']},
+      {name:'Purgeur coude Flexvent H Blanc Flamco', diameters:['1/2']},
+    ],
+  },
+
+  sanitaire: {
+    'Kits raccordement WC suspendu': [
+      {name:'Kit raccord WC suspendu PMR L40cm d90-d45', diameters:['standard']},
+      {name:'Kit raccord WC suspendu joint levres L18.5cm chrome mat d90-d45', diameters:['standard']},
+    ],
+    'Collecteurs sanitaires monobloc a vannes': [
+      {name:'Collecteur MF 3/4 monobloc a vannes 1/2', diameters:['2 departs','3 departs','4 departs','5 departs','6 departs','7 departs','8 departs']},
+    ],
+    'Platines Robifix a sertir': [
+      {name:'Robifix a sertir entraxe 60mm M3/8 ST', diameters:['D12','D16']},
+      {name:'Robifix mono a sertir type Acome F1/2', diameters:['D12','D16']},
+      {name:'Robifix a sertir entraxe 150mm F1/2 ST D12', diameters:['standard']},
+      {name:'Sortie cloison PER 150mm F1/2-16', diameters:['standard']},
+      {name:'Robifix 150mm F1/2 CU D14 pour cuivre a souder', diameters:['standard']},
+    ],
+  },
+
+  chauffe_eau: {
+    'Chauffe-eau Duralis ACI hybride': [
+      {name:'Duralis VM', diameters:['100L','150L','200L']},
+      {name:'Duralis VM Compact', diameters:['100L','150L','200L']},
+      {name:'Duralis VS', diameters:['150L','200L','250L','300L']},
+      {name:'Duralis HM', diameters:['100L','150L','200L']},
+      {name:'Duralis ACI Hyb VM 050L', diameters:['standard']},
+      {name:'Duralis VM 075L', diameters:['standard']},
+    ],
+    'Chauffe-eau Steatis standard': [
+      {name:'Steatis Comp VM', diameters:['100L','150L','200L']},
+      {name:'Steatis VM', diameters:['050L','075L','100L','150L','200L']},
+      {name:'Steatis VS', diameters:['200L','250L','300L']},
+      {name:'Steatis HM', diameters:['075L','100L','150L','200L']},
+    ],
+    'Chauffe-eau plat Malicio': [
+      {name:'Malicio 3 MP', diameters:['040L','065L','080L','100L']},
+      {name:'Malicio 3 VM', diameters:['100L','120L','150L']},
+    ],
+    'Chauffe-eau blinde': [
+      {name:'TH Blinde etroit VM 050L', diameters:['standard']},
+      {name:'TH Blinde VM', diameters:['050L','075L','100L','150L','200L']},
+      {name:'TH Blinde Comp VM', diameters:['100L','150L','200L']},
+      {name:'TH Blinde VS', diameters:['200L (Stable)','300L']},
+      {name:'TH Blinde HM', diameters:['075L','100L','150L','200L']},
+      {name:'TH Blinde HM racc. cote', diameters:['075L','100L','150L','200L']},
+    ],
+    'Chauffe-eau petites capacites Ristretto': [
+      {name:'Ristretto sur 010L', diameters:['standard']},
+      {name:'Ristretto sous 010L', diameters:['standard']},
+      {name:'Ristretto Compact sur 015L', diameters:['standard']},
+      {name:'Ristretto Compact sous 015L', diameters:['standard']},
+      {name:'Ristretto sur 015L', diameters:['standard']},
+      {name:'Ristretto sur 030L', diameters:['standard']},
+      {name:'Ristretto 2 carre sur 015L', diameters:['standard']},
+      {name:'Ristretto 2 carre sous 015L', diameters:['standard']},
+      {name:'Ristretto 2 carre sur 030L', diameters:['standard']},
+    ],
+    'Chauffe-eau PECS': [
+      {name:'TH PECS MP', diameters:['100L','150L','200L']},
+      {name:'TH PECS VM', diameters:['100L','150L','200L']},
+      {name:'TH PECS VS 200L', diameters:['standard']},
+    ],
+  },
+
+  colliers_isolants: {
+    'Colliers isolants Pirflex (embase M8/M10)': [
+      {name:'Collier isolant Pirflex D14 EP19', diameters:['standard']},
+      {name:'Collier isolant Pirflex D17', diameters:['EP13','EP19','EP25','EP32']},
+      {name:'Collier isolant Pirflex D21', diameters:['EP19','EP25','EP32']},
+      {name:'Collier isolant Pirflex D27', diameters:['EP19','EP25','EP32']},
+      {name:'Collier isolant Pirflex D34', diameters:['EP19','EP25','EP32']},
+      {name:'Collier isolant Pirflex D42', diameters:['EP19','EP25','EP32','EP40']},
+      {name:'Collier isolant Pirflex D49', diameters:['EP19','EP25','EP32','EP40']},
+      {name:'Collier isolant Pirflex D54', diameters:['EP19','EP25','EP32']},
+      {name:'Collier isolant Pirflex D60', diameters:['EP19','EP25','EP32']},
+    ],
+    'Colliers isolants Pirflam + Parvabright (embase M8/M10, long. renforcee)': [
+      {name:'Collier isolant Pirflam+Parvabright D21 EP30 L50', diameters:['standard']},
+      {name:'Collier isolant Pirflam+Parvabright D27', diameters:['EP30 L50','EP40 L50']},
+      {name:'Collier isolant Pirflam+Parvabright D34', diameters:['EP30 L50','EP40 L50']},
+      {name:'Collier isolant Pirflam+Parvabright D42', diameters:['EP30 L50','EP40 L50']},
+      {name:'Collier isolant Pirflam+Parvabright D49', diameters:['EP30 L50','EP40 L50']},
+      {name:'Collier isolant Pirflam+Parvabright D54', diameters:['EP30 L50','EP40 L50']},
+      {name:'Collier isolant Pirflam+Parvabright D60', diameters:['EP30 L50','EP40 L75','EP50 L75']},
+      {name:'Collier isolant Pirflam+Parvabright D54 EP50 L75', diameters:['standard']},
+    ],
+  },
+
+  acier_sertir: {
+    'Bouchons Megapress': [
+      {name:'Bouchon Megapress 4256', diameters:['10-3/8']},
+    ],
+    'Coudes Megapress 45°': [
+      {name:'Coude Megapress 45 FF', diameters:['1"1/4x1"1/4']},
+      {name:'Coude Megapress 45D FF', diameters:['3/8','1/2','3/4']},
+      {name:'Coude Megapress 45D MF', diameters:['3/8','1/2','3/4','1P']},
+      {name:'Coude 45D 1P1/2 MF acier a sertir Megapress', diameters:['standard']},
+      {name:'Coude 45D 2P FF acier a sertir Megapress', diameters:['standard']},
+      {name:'Coude 45D 2P MF acier a sertir Megapress', diameters:['standard']},
+    ],
+    'Coudes Megapress 90°': [
+      {name:'Coude Megapress 90D FF', diameters:['3/8']},
+      {name:'Coude Megapress 90D MF', diameters:['3/8','1/2','3/4','1P','1P1/4','1P1/2','2P']},
+      {name:'Coude 90D 1P1/2 FF acier a sertir Megapress', diameters:['standard']},
+    ],
+    'Manchons Megapress': [
+      {name:'Manchon coulissant Megapress 4215.5 FF', diameters:['3/8','1/2','3/4','1"','1P1/4','1P1/2','2P']},
+      {name:'Manchon Megapress XL coulissant FF', diameters:['76,1 (2"1/2)','88,9 (3")']},
+    ],
+    'Pieces de transition Megapress': [
+      {name:'Piece transition bronze Megapress 42132', diameters:['15-1/2x18','20-3/4x22','25-1x28','32-1/4x35','40-1/2x42','50-2x54']},
+      {name:'Piece transition Megapress 4213', diameters:['3/8-15','1/2-15','3/4-22']},
+      {name:'Piece transition Megapress M', diameters:['3/8-3/8','1P-1P','1P1/4-1P1/4','1P1/2-1P1/2','2P-2P']},
+    ],
+    'Raccords 2P Megapress 4263': [
+      {name:'Racc 2P Megapress 4263 FF', diameters:['32-1P1/4/1P1/2','40-1P1/2/1P1/2','50-2P/2P']},
+    ],
+    'Reductions Megapress': [
+      {name:'Reduction Megapress 4215.1 MF', diameters:['15-1/2 / 10-3/8']},
+    ],
+    'Tes reduits Megapress': [
+      {name:'Te reduit Megapress', diameters:['1"x3/4"x1"','1"x1/2"x1"','1"1/2x1"x1"1/2','1"1/4x1/2"x1"1/4','1"1/4x3/4"x1"1/4','2"x1"x2"','2"x1"1/2x2"','2"x1"1/4x2"','3/4"x1/2"x3/4"']},
+      {name:'Te reduit taraude Megapress', diameters:['1"x1/2"Fx1"','3/4"x1/2"Fx3/4"']},
+    ],
+    'Tes acier galva filetes': [
+      {name:'Te galva filete', diameters:['1/2','3/4','1P','1P1/4','1P1/2','1P1/2x1Px1P1/2','2P']},
+    ],
+    'Reductions acier galva filetees': [
+      {name:'Piece de reduction galva', diameters:['3/4x1/2','1Px1/2','1Px3/4','1P1/4x3/4','1P1/4x1P','1P1/2x1P','1P1/2x1P1/4','2Px1P','2Px1P1/4','2Px1P1/2']},
+    ],
+    'Pieces de transition acier galva filetees': [
+      {name:'Piece de transition galva', diameters:['1/2x1/2','3/4x3/4']},
+    ],
+  },
+
+};;
+
+const CISEPZ_LOGO_PDF = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAUoAAAA3CAYAAABq4gOuAAAKVUlEQVR4nO2dbawdRRmAn0M/wlWgpUUpTblU1KhFIY1EIQWtVdCqWK1eUFNBbRVQgQIKWCHSaGIMAhWISJUUCPWrVqsi/qhKJCj+0KiY+lEMFC8KtQhCipVb2uOP2eXs2TO7O7M7s7Nn7/skmz07OzPve/bj3fl8p3PwoYfTIDrAWdH2OuCAjHi/B24HNgKP1qKZIAiTlk4DDOU1wIUO8rkDOM1BPoIgCH1kldh883GgG20ujCTA2xN53uwoT0EQhNpLlDegjGRd/BV4eY3yBEFoIVNrkvMJ4PqaZCV5GaqE+X1geQD5OkaA10f7/R7y/pYm/CXAPoP001EfF1PmAa8xzLuIqcCfgX/RX9OZEu0fKdBjwoEOVZkOPBxaCQuOBnaHVgJ1j58A/hdakSzqKFF2fQuw4AXAYwHkfg1YVZOsa4CLE8dTgGct0q8Frsw5PwL8116tynQywpv0fMWkdQ2l49nA+oxz64AL6lPFiKx7HByfbZQfpHkP8S7qM1igeue7NctMfwhsS3uP55zbRhgjKZTjJtTzN01zLq+ELqTwZSi3ARs85V2VNTXIeDHqAT2uBll10QUWhFZCKMUE8KZUmIvmkkmDD0PZ9Bdqp+f8zwP+5llG3fwktAJCZbaGVmCYcW0oXVS1b0SVSPP4TxSvaQ3nK4HrQivhgbeEVkBwQtOawoYGl4ayyk04B9WQ2wFOBY4piD8TOBc4MkpzbAXZLvl6aAWAg1PH0y3Tz04dP11BF6F5xO/8YUG1GGRjaAXycDU86B8l0x0D/ClxbGts446Sm+n1mIX6ajbla31X6ngCeBLYS7GOI8CXU2H3Agtx36Y1BdWh8DS9IUBZ5H3QL0CV5Pc60suUCWAu8Hx613U6cJsmrun1t2E/6p7MtUy3AxhFGaZLHepTlRWhFcjDxfCgi4EvWaa5EDU8IUmVh2g1/S/4K+g3wEl+DZxYQZaOK4HPlkw7B//tpkK7sX13XA7DcWH8GzssKMaFoXRxk3xd7GcZLK34MJRl9D8HNXxDEKoyCjxkEd+FYVoE3OMgn8YbSajeRmljIPahvyh3V9QhT5ep+J/3/coSad6DGEnBHZfULO9WJpGRhGptlNdaxH0UOCLj3MkVdDBhFWpa3KejY9fTBn9sGf9JYLNjHYTJy1rq9Z+wCzcdQUNjJKGaoVxtGG8v2UbytRXk67gLeIMmfA3wPFTDv26WQhVGLePPdCy/iA52H4c1wBcSxyE7qUxeprr1K/OCN6WjD/Knpxbh4n/sRLXLDxVlq973WcTNG56yrqT8LBbnnFsd7ctUlYcZ24c77ZjgdFeKlKALPBhQfhtZWzKdCyO5gSE0klC+RPkqw3hFX98TSsovSwdYVrPMJMPYu70psPz5qJd0qKpqDUXnWcoEF0byrQzxDK+yhtLkoT3IIM4e1Ni9OpmJuvF7cuKM4OfFdNVx5ZPtmrAO4auPu1Den4TyvM8y/qTq2c7Dp/egOcBFBXF0L6Vvbon2IzmbL3x3XLng3xnhoR/2ps0kGTZs79/ViJF8Dp+Gcj/qYuexzrHMJwrOm5aKrqqqSAbD0D6TN0umQ1hHr6FLtcPIm7E3Vn+nuJBjQiuMJPh13Dubnm/EvAvm8uFfiPIBWVWOzQ0OOSvCFBsdTwJ+aRDvcuBz5dSpREinuPdRznWerY4PUG50Ruwp/A7gshLpwd31bI2RBL+G8oX0d17U4aHahYwjsfNKtBJ7Zxh1P0Q+DKUrqn5o2vahCmlgXLyLdwJvc5BPo6hzFcYuyoFAGlcPRpZbe9ubb+u6rczMn++WSNNWbO//PC9aCC6M5CpaaCSh/uVqdwPf0YT/wkHeaT+QS2luaePdyPjAmPMt4w/jEKsmswB3vhZau0x0iHW9xxi8MYsp7ojJQ1cdu7NiHr7Tzkfp+RvMx6W2jcsZdOtWRFV3aosqpm8bRU6yTfidgzwaTQhDGdOl32DOAj5lmcc2+o3ULsp9HZeUSJNG54fQhFejOgm6jrYPlP4H+bjSL7mF6Ay6p4K+ptuw4ErXhbT8uoU0lDHxRboa5ddyCmZOYk9CTUdcnsijzFi7NQw6uy3DWQ7ycEGbq6Y3hlZAmJw0wVDGXIQydvso9ngNvZJBFU88aQcQVWnVkIgG8rHQCrQIXzWPVuJqKQgdJsYuJL7mnjZhul8bkY+QW2T0gAU+S5RNNpQd/E7Q7wBXeMx/sjEjtAItpO41hoYan4byYdzMFXVNXSWTz0eyflqTvBgTZyR51O2kpIgO8FRoJVqIbkyzkIHvNsqTaU6V6Z2E0eWUSO50YEsN8qoO97jfiRbV2EJv+eIiQs491/FPTdhu1PA3k60u/lijrKHH5xTGNOdjP2bOBT8H3hhAriAILaHOXu/rUCUE27GSZdkcyRMjKQhCJeosUep4HDjUcZ7HA791nKcgCJOY0OMoZ9Fri/piyTw2odr/4nzESAqC4JTQJUpBEITGE7pEKQih6QJfCa2E0Gx8zswRhGFgCW7m+gstRqreQps4ArV29DjwkYK470e1bd+PcnN3EMopiy7eN1JhS8me2bUM+IEm/AxUx+UMev4MyrTLn4qa9XU38JmMOEejVhl9xCC/M4Bva8LHUHp+LxW+CDX9UZcmie66xVwa5T2Oug5zyb4eWfrFLACuR40LXZ0T7xDgKAbHj46hX5J5DLWczQxgnxhKoS3o5tePA6OGcUE/wL2rOddFPz73GXodiyYy1wNnZ+iiQ5fHFahZYLp4RQP216FWBsjT9xT6Z5eZ5B3H2QG8KHVuGjCRkS6d5zzUPbRZ4uU29J68dHr/CjgxI/++vKWNUmgDyZcg3g5DbySTdFKbiYyYBzRx/mIpr4yRTKa/jEEjacNDBnG2anTI46jE7/ma83sZvN5Z1z/PZaDuevwIOBM40EBPKJ6F9lzeYiiFtpBe4C1rffIk0zCb8zwe7T9ppdEg8TIopi9ymlmp47JD6kzZGO1PSITdUJBmR7TFhs+nO7dzU8fviPZ7HOX/zWh/oBhKoS2sTfxOes1+JifNBGoe9u0FeY+iqnRXoVYXLUu8DIrtizw72tc5FxxgBfAh4F6U3puA8wzSJduHy3r+N+GrFdMXOVt5L9H9EkMptIXxxO+46g35/gXiqtUKg/zjdq+4OmhSYs2SZ+ucJZZ1UwmZVbkl8fv0grg/i/Zbqccn64OJ37ei2lxBLa1iwljBeal6C60ibuvbngh7LNpf4lBO0sDplisp8sG6vILsncBHUUumxHQpftnzKNI3bm/cgqpOF7EEtaJq+oNQ1mjm6bcB1Qb6w+j4THpLVh+niR/7NP1DtF8KHE7+TL5l8Q8xlEIbWI9ytvJS+heqMumgsV3cKn55deszHVKQdnNK3vb86H3MQRmheMmUWF/d0JaYov9X1D4bt6W+i8He6zQro/3iVHiVpVryfKN+GLWG0mmY3bunUM/JsVH8eJXW43PSbInidmV4kCAIbeIAYL+PTAVBENqCcyMJYigFQRAKEUMpCIJQgBhKQRCEAqaiJrkLgiAIGfwfJsYdJR0ihKwAAAAASUVORK5CYII=';
+
+const OFFICIAL_CHANTIERS = [
+  ['A26-0103','ETB : cabinet medical a Meylan : travaux de CVC et plomberie v2'],
+  ['A26-0102','depannage fuite chauffage'],
+  ['A26-0101','TE CONNECTIVITY : EXTRACTION D\'AIR'],
+  ['A26-0100','DELTAGER immeuble SEMAPHORE: LOT N01 CHAUFFAGE - RAFRAICHISSEMENT - ELECTRICITE - GTC'],
+  ['A26-0099','ARTIBO : JACQUERE : Depannage wc : Montbonnot'],
+  ['A26-0098','CHRISTELLE PEYRIN : RENOVATION SDB : ECHIROLLES'],
+  ['A26-0096','PETZL VESTIAIRES / ASSERVISSEMENT TRACAGE ELECTRIQUE'],
+  ['A26-0095','HOTEL MOKA : REFECTION ECS'],
+  ['A26-0094','ARTIBO: CASRA Salaise sur Sanne: Travaux CVC 1x deplacement, 1x supression, 2x nouvelles V3'],
+  ['A26-0092','ARTIBO : REMPLACEMENT CHAUFFE-EAU : ISARD : ECHIROLLES'],
+  ['A26-0090','EHPAD DE DOMENE - Mise en place d\'extracteurs ventilation dans la chaufferie et sous station - V2'],
+  ['A26-0088','APIM : SCCV: Amenagements CLIENT 1 : Lot A1 LEGALLAIS remise'],
+  ['A26-0087','CORRIDOR : labelisation BREEAM : KIS : ECHIROLLES (automatique)'],
+  ['A26-0086','APIM : SCCV: Amenagements CLIENT 1 : Lot C2 a C5 LEGALLAIS remise'],
+  ['A26-0085','Mr VEILEX : TRAVAUX DE CLIMATISATION : ST ISMIER V4'],
+  ['A26-0084','CISEPZ : TRAVAUX D\'AMENAGEMENT'],
+  ['A26-0083','Mr et Mme MANZOTTI : Remplacement chaudiere par condensation WEISHAUPT : CORENC V2'],
+  ['A26-0082','Termat tp : CREATION VESTIAIRES : PB/SAN/VMC/CLIM : NOYAREY'],
+  ['A26-0081','SOITEC - Formation immeuble le Damona VRV / GTC'],
+  ['A26-0080','LYNRED E6-2 / FTM 2569 / Climatisation local onduleur LOG 404'],
+  ['A26-0078','STIL CONSTRUCTION : TRAVAUX CVC : RENAISSANCE salle azote liquide V2'],
+  ['A26-0077','RENAISSANCE FUSION : Travaux VMC Local MATRIX ROOM Bdc n001575'],
+  ['A26-0076','HABILIS : BHT 3 : R+2 et R+1 : Amenagement Preneur QUOBLY LOT 9,10 et 13'],
+  ['A26-0074','Etablissement Thermal d\'Uriage / Rhumatologie 1 : Creation des eaux usees V1'],
+  ['A26-0072','PETZL ROTHERENS - MODIFICATION AC LOGISTIQUE'],
+  ['A26-0071','STIL CONSTRUCTIONS : ST AGNES RESTAURANT/LAVERIE'],
+  ['A26-0070','ALGECO : ALBY-SUR-CHERAN : Travaux pose de climatisation loue'],
+  ['A26-0068','Etablissement Thermal d\'Uriage - Divers interventions 2026'],
+  ['A26-0067','CAMPENON BERNARD DAUPHINE SAVOIE : FRAMATOME : LOT 18_CVC LOT 20_PLB'],
+  ['A26-0065','Mme MOSSIERE : CREATION DE 1 SDB : GRENOBLE V2'],
+  ['A26-0064','Mr OLAGNON PIERRE : TRAVAUX DE CLIMATISATION : SAINT MARTIN D\'HERES'],
+  ['A26-0062','ATMOS ECHIROLLES: KIS : Travaux Clim et plomberie pour refection isolation facade V2'],
+  ['A26-0060','M. Mme BAILLE : TRAVAUX DE CLIMATISATION MAISON (x5 unites + 1x groupe)'],
+  ['A26-0057','ARTIBO : SDD MAZUIR : Renovation d\'une salle de douche : Lot PB/SAN/CH'],
+  ['A26-0055','LAURENT Claire : TRAVAUX DE CLIMATISATION v2'],
+  ['A26-0053','SINISTRES SDC 222 RUE LAFAYETTE IMMEUBLE BUREAUX'],
+  ['A26-0052','ALGECO : NAVER a MEYLAN : Travaux pose de climatisation loue bdc n137498'],
+  ['A26-0051','PETZL ROTHERENS - ATELIER BATIMENT B'],
+  ['A26-0050','STIL CONSTRUCTIONS'],
+  ['A26-0047','BHT 1 : MINATEC SOITEC : TRAVAUX VENTILATION commande N BHT1-C26-015'],
+  ['A26-0046','UTPT-D : GILLONNAY LOT CVC - PB'],
+  ['A26-0042','RESTRUCTURATION EHPAD ST BRUNO LOT 26B PLOMBERIE / LOT 22A CVC DESENFUMAGE'],
+  ['A26-0038','GIE GIMMECA: Clinique du DRAC : Diagnostic chauffage RDC HAUT et BAS'],
+  ['A26-0037','ROSIN - Amenagement du lot 2 Batiment ROSIN'],
+  ['A26-0034','CENTRE HOSPITALIER ALBERTVILLE MOUTIERS - EXTENSION IMAGERIE LES DORONS : LOT 09 CVC - PLOMBERIE V3'],
+  ['A26-0032','HUDRY'],
+  ['A26-0031','SCCV SPACE EUROPE: Amenagements CLIENT 2 : Lot B4 a B5 SIEMENS'],
+  ['A26-0028','PETZL CROLLES // BUREAUX DIRECTION // REMPLACEMENT DIFFUSEURS'],
+  ['A26-0027','MR AMIRANTE : Renovation d\'une maison : Lot PB/SAN/CH V3 sans fournitures'],
+  ['A26-0023','VIVIERS Grenoble : TRAVAUX PLOMBERIE KITCHINETTE'],
+  ['A26-0022','ISERE AMENAGEMENT - Les GLAIRONS_SYMBHI Transformation des bureaux_V3'],
+  ['A26-0021','SCI SBL: Travaux locaux commun: PB VMC V2'],
+  ['A26-0020','ARTIBO :SAS 2P ISARD C/O SARL BERRY\'S : TRAVAUX CLIMATISATION bdc n00000747'],
+  ['A26-0018','ALGECO : PETZL EYBENS : TRAVAUX DEPOSE CLIM'],
+  ['A26-0017','KIS: Travaux reseaux enterre'],
+  ['A26-0013','ERIC DUPUY : TRAVAUX DE CLIMATISATION REMISE'],
+  ['A26-0012','ONET Travaux Maintenance Facturation TWIMM'],
+  ['A26-0011','CDRP Travaux Maintenance Facturation TWIMM'],
+  ['A26-0007','CISEPZ H: DIVERS INTERVENTIONS 2026'],
+  ['A25-0200','CONSTRUCTION OFFICE NOTARIAL A GONCELIN LOT CHAUFFAGE VENTILATION PLOMBERIE'],
+  ['A25-0198','COFUA / BARJANE - LOT 8 CVC PLOMBERIE V3'],
+  ['A25-0193','ZENTO R+1 Amenagement Isere Attractivite - V3'],
+  ['A25-0191','SCI PORTOVENERE : NOVIA ARCHITECTURE: Renovation d\'une maison a Chamonix: Lot PB/SAN/CH V3'],
+  ['A25-0189','SINISTRE- LE TRIANGLE'],
+  ['A25-0186','SAFRAN/KORUS : AEROSPACE & DEFENSE OXYGEN SYSTEMS SAS'],
+  ['A25-0185','STIL CONSTRUCTIONS : ST AGNES : TRAVAUX CVC / PBS'],
+  ['A25-0181','TELENCO - SYSTEME DE RECHAUFFAGE POUR CUVE INOX PROCESS - 2 Resistances - Indice C'],
+  ['A25-0180','TERRITOIRES AIVS : Remplacement d\'un chauffe eau HS'],
+  ['A25-0178','ARTIBO :Mr et Mme FERRIER :Creation salle de douche: PL/VMC : HERBEY V2'],
+  ['A25-0176','STIL: ALAT : Bat JOHNSON SPATIAL: Amenagement vestiaires: Lot CVC-Plomberie Sanitaire V2'],
+  ['A25-0173','EXTENSION DE L\'HOTEL ADELPHIA Lots PLB/ CVC'],
+  ['A25-0172','SDC L\'AGORA: FONCIA: LOCATION PAC'],
+  ['A25-0170','ALGECO CERN : ENTRETIEN CLIMATISATION'],
+  ['A25-0165','NOVIA INGENIERIE: LEITNER : Chauffage clim atelier ROOF TOP / Reamenagement vestiaire Lot CVC/PB/San'],
+  ['A25-0160','DENTRESSANGLE : BATIMENT XPO : SEVREY : REHABILITATION BUREAUX CLIMATISATION V2'],
+  ['A25-0159','PETZL ROTHERENS - RENOVATION DES VESTIAIRES'],
+  ['A25-0157','CEA/GRENOBLE - Batiment C3 / R+2 Aile B : Modifications gaine textile'],
+  ['A25-0156','SPIE BATIGNOLLES: Construction d\'un site de methanisation a Murianette : lot CVC + PB V3 bis'],
+  ['A25-0155','Rehabilitation de la salle polyvalente de Roybon - Lot 14 Chauffage Ventilation Sanitaire'],
+  ['A25-0154','MAIRIE LE TOUVET : VMC GRANDE SALLE'],
+  ['A25-0148','TERRITOIRE 38 : Op 2251 - Creation etablissement accueil jeunes enfants EAJE : Lot 14 Plomberie-Chauffage-Ventilation'],
+  ['A25-0145','CEA BATIMENT C4 - TRANSFORMATION DES SOUS-STATIONS'],
+  ['A25-0143','PI DOYEN - AMENAGEMENT REGUS - PIXEL'],
+  ['A25-0140','HRS Champagnier: Ventilation Soudure et Bunker V3'],
+  ['A25-0136','Remi REBERT : Mise en place d\'une climatisation VERSION GAINABLE v2'],
+  ['A25-0133','Commune Le Champ-pres Froges (38) : RENOVATION ENERGETIQUE ECOLE PRIMAIRE LE CHAMP-PRES-FROGES'],
+  ['A25-0131','PETZL ROTHERENS - RACCORDEMENT MACHINES'],
+  ['A25-0130','ARTIBO : RENOVATION ATELIER : BRESSON'],
+  ['A25-0128','ELEGIA: ZENTO AMENAGEMENT R+3'],
+  ['A25-0125','FORTIS : HOTEL IBIS GRENOBLE : REFECTION DE 35 CHAMBRES'],
+  ['A25-0123','RE-STORE : AMENAGEMENT DES BUREAUX SOBIODA ESPACE CHANTOURNE 38240 - MEYLAN V4'],
+  ['A25-0120','PETZL EYBENS / REAMENAGEMENT BUREAUX & ACCUEIL / PHASE 2'],
+  ['A25-0117','SAS M.M.S INVEST : MATACENA PADEL : Ensemble sportif espaces d\'activites SUSVILLE V3'],
+  ['A25-0101','BONNENFANT Christelle : Renovation plomberie appartement R+2 au 1 place Jo Barruel BOURG D\'OISANS V4'],
+  ['A25-0098','CARRE DES ALPES : Remplacement chaudieres'],
+  ['A25-0097','SGAMI Hotel de police de chambery - Rehabilitation rez de chaussee annexe Boisse'],
+  ['A25-0094','CCAS Ville de DOMENE : Residence les ARCADIE : Travaux chaufferie'],
+  ['A25-0090','COMMUNE DE ST ETIENNE DE CROSSEY: Demolition et construction salle multi-activites: Lot 14 CVS'],
+  ['A25-0089','DOUANE DE CHAMBERY : BUREAU SRA : TRAVAUX ELEC/PEINTURE/SOL V2'],
+  ['A25-0086','ELEGIA - DIDEROT LABS 2'],
+  ['A25-0085','STIL CONSTRUCTION : NORECO : LAVERIE Lot Ventilation/plomberie/gaz + reseaux plomberie'],
+  ['A25-0080','SCM CLINIQUE DE RADIOLOGIE: Centre d\'imagerie Groupe du Mail : Installation IRM 1.5 TESLA Clinique des Cedres'],
+  ['A25-0071','COMMUNE DE CHALLES LES EAUX : EXTENSION DU POLE ENFANCE CHALLES LES EAUX - 73'],
+  ['A25-0069','V2 - SIGMA VAULX MILIEU: NOR-ISERE PARC : Lot F1 CVC: AMENAGEMENT F1 TRANCHE 2 : V2 + remise'],
+  ['A25-0059','PETZL ROTHERENS - PRODUCTION AIR COMPRIME'],
+  ['A25-0055','SIGMA SAINT RAMBERT D\'ALBON : Travaux CVC/PLOMBERIE & ELEC'],
+  ['A25-0039','SAINT AGNES : Renovation bureau de ST AGNES a Fontaine'],
+  ['A25-0028','HRS - CONSTRUCTION DE LA PHASE 2 DE L\'UNITE DE PRODUCTION'],
+  ['A25-0011','CEA BATIMENT C3 - PROJET 2B2C'],
+  ['A25-0007','CISEPZ H: DIVERS INTERVENTIONS 2025'],
+  ['A24-0182','ALEDIA CHAMPAGNIER'],
+  ['A24-0154','ARTIBO : Ostheo immeuble Evasion lot CVC - PBS V6'],
+  ['A24-0144','HORDEAU: Alimentation d\'eau generale'],
+  ['A24-0136','HEMERA: Amenagement de bureaux a Meylan'],
+  ['A24-0075','MR Mangione: restaurant la basse cour: hotte de cuisine'],
+  ['A24-0063','GEG : Renovation du restaurant : Travaux climatisation / chauffage & ventilation'],
+  ['A24-0060','PETZL ROTHERENS - EXTENSION USINE'],
+  ['A24-0048','ISERE AMENAGEMENT - Les GLAIRONS_V2 : SYMBI: Construction neuve batiment tertiaire St-Martin-d\'Heres (38)'],
+  ['A24-0013','TELEDYNE GECKO PHASE 3'],
+  ['A23-0225','TOTEM : TRIBUNAL DE JUSTICE GRENOBLE : Mise aux normes accessibilite AdAP'],
+  ['A23-0215','MILLET : RENOVATION SDD'],
+  ['A23-0190','STIL CONSTRUCTION : M.BOUJARD Matthieu : 30 rue Guy Moquet Echirolles: Divers travaux'],
+  ['A23-0175','M.MILLET Jean Francois : Divers travaux chauffage et plomberie'],
+  ['A23-0120','GRENOBLE ALPES METROPOLE : FORUM: Travaux de rehabilitation du siege'],
+  ['A23-0118','CISEPZ A: AIR LIQUIDE : SANITAIRE EULER'],
+  ['A23-0104','SOFT BUILDING : Immeuble le Belem au 2 rue Albroise Pare 69800 ST PRIEST'],
+  ['A22-0242','GEG : Reamenagement des bureaux GEG - 49 rue Felix Esclangon a Grenoble : Lot CVC-Plomberie/Sanitaire'],
+  ['A22-0201','SARL EURIS : Amenagements des locaux : Extraction particuliere R+1'],
+  ['A22-0167','LE ZENTO'],
+  ['A22-0112','LYNRED BATIMENTS E6-1 & E6-2'],
+];
+
+let savedData=JSON.parse(localStorage.getItem('cisepz_list_v2')||'[]');
+let chantiers=JSON.parse(localStorage.getItem('cisepz_chantiers_v1')||'[]');
+let selectedItems={};
+let currentNet=null;
+let currentListFilter='';
+let currentChantier='';
+let deferredPrompt=null;
+
+// ===== PWA =====
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  if(!localStorage.getItem('install-dismissed'))document.getElementById('install-banner').style.display='flex';
+});
+document.getElementById('install-btn').addEventListener('click',async()=>{
+  if(!deferredPrompt)return;
+  deferredPrompt.prompt();
+  const{outcome}=await deferredPrompt.userChoice;
+  if(outcome==='accepted')showToast('App installee !');
+  deferredPrompt=null;document.getElementById('install-banner').style.display='none';
+});
+document.getElementById('close-banner').addEventListener('click',()=>{
+  localStorage.setItem('install-dismissed','1');document.getElementById('install-banner').style.display='none';
+});
+
+// ===== UTILS =====
+function save(){localStorage.setItem('cisepz_list_v2',JSON.stringify(savedData));updateBadge()}
+function updateBadge(){const b=document.getElementById('badge');if(savedData.length>0){b.style.display='flex';b.textContent=savedData.length>99?'99+':savedData.length}else b.style.display='none'}
+function showView(id){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-'+id).classList.add('active');window.scrollTo(0,0)}
+function goHome(){showView('networks');updateActiveChantierBanner()}
+function showLists(){currentListFilter=currentChantier||'';showView('lists');renderList()}
+function getFilteredData(){return currentListFilter?savedData.filter(d=>d.project_name===currentListFilter):savedData}
+
+// ===== CHANTIERS =====
+let chantierSearchQuery='';
+let chantierShowArchived=false;
+function saveChantiers(){localStorage.setItem('cisepz_chantiers_v1',JSON.stringify(chantiers))}
+function showChantiers(){renderChantiers();showView('chantiers')}
+function importOfficialChantiers(silent){
+  let added=0;
+  OFFICIAL_CHANTIERS.forEach(([code,label])=>{
+    const fullName=`${code} - ${label}`;
+    const alreadyExists=chantiers.some(c=>normalizeStr(c.name)===normalizeStr(fullName)||normalizeStr(c.name).startsWith(normalizeStr(code)+' '));
+    if(!alreadyExists){
+      chantiers.push({id:'off_'+code+'_'+Date.now()+'_'+Math.random().toString(36).slice(2),name:fullName,code:code,archived:false,fromCatalog:true,created_at:new Date().toISOString()});
+      added++;
+    }
+  });
+  if(added>0){saveChantiers()}
+  renderChantiers();
+  if(!silent){
+    showToast(added>0?`${added} chantier${added>1?'s':''} importe${added>1?'s':''} !`:'Chantiers deja a jour');
+  }
+  return added;
+}
+function migrateChantierFlags(){
+  // Repare les chantiers deja enregistres (versions precedentes) qui n'ont pas
+  // encore l'etiquette fromCatalog, pour que le filtrage "mes chantiers travailles" fonctionne.
+  let changed=false;
+  chantiers.forEach(c=>{
+    if(c.fromCatalog===undefined){
+      const isOfficial=OFFICIAL_CHANTIERS.some(([code])=>c.name.startsWith(code+' - ')||c.name.startsWith(code+' '));
+      c.fromCatalog=isOfficial;
+      changed=true;
+    }
+  });
+  if(changed)saveChantiers();
+}
+function addChantier(){
+  const inp=document.getElementById('new-chantier-name');const name=inp.value.trim();
+  if(!name){showToast('Entrez un nom de chantier','err');return}
+  if(chantiers.some(c=>normalizeStr(c.name)===normalizeStr(name))){showToast('Ce chantier existe deja','err');return}
+  chantiers.push({id:Date.now()+'_'+Math.random().toString(36).slice(2),name,archived:false,created_at:new Date().toISOString()});
+  saveChantiers();inp.value='';renderChantiers();showToast('Chantier cree !');
+}
+function deleteChantier(id){
+  const ch=chantiers.find(c=>c.id===id);if(!ch)return;
+  const count=savedData.filter(d=>d.project_name===ch.name).length;
+  const msg=count>0?`Supprimer "${ch.name}" ? ${count} article${count>1?'s':''} resteront dans la liste generale (sans chantier).`:`Supprimer le chantier "${ch.name}" ?`;
+  if(!confirm(msg))return;
+  chantiers=chantiers.filter(c=>c.id!==id);saveChantiers();
+  if(currentChantier===ch.name){currentChantier='';updateActiveChantierBanner()}
+  renderChantiers();showToast('Chantier supprime');
+}
+function renameChantier(id){
+  const ch=chantiers.find(c=>c.id===id);if(!ch)return;
+  const newName=window.prompt('Nouveau nom du chantier :',ch.name);
+  if(!newName||!newName.trim())return;
+  const trimmed=newName.trim();
+  if(trimmed===ch.name)return;
+  if(chantiers.some(c=>c.id!==id&&normalizeStr(c.name)===normalizeStr(trimmed))){showToast('Ce nom existe deja','err');return}
+  const oldName=ch.name;
+  ch.name=trimmed;
+  saveChantiers();
+  savedData.forEach(d=>{if(d.project_name===oldName)d.project_name=trimmed});
+  save();
+  if(currentChantier===oldName)currentChantier=trimmed;
+  if(currentListFilter===oldName)currentListFilter=trimmed;
+  renderChantiers();updateActiveChantierBanner();
+  showToast('Chantier renomme !');
+}
+function toggleArchiveChantier(id){
+  const ch=chantiers.find(c=>c.id===id);if(!ch)return;
+  ch.archived=!ch.archived;
+  saveChantiers();
+  if(ch.archived&&currentChantier===ch.name){currentChantier='';updateActiveChantierBanner()}
+  renderChantiers();
+  showToast(ch.archived?'Chantier archive':'Chantier reactive');
+}
+function duplicateChantier(id){
+  const ch=chantiers.find(c=>c.id===id);if(!ch)return;
+  const suggested=`${ch.name} (copie)`;
+  const newName=window.prompt('Nom du nouveau chantier (liste dupliquee) :',suggested);
+  if(!newName||!newName.trim())return;
+  const trimmed=newName.trim();
+  if(chantiers.some(c=>normalizeStr(c.name)===normalizeStr(trimmed))){showToast('Ce chantier existe deja','err');return}
+  chantiers.push({id:Date.now()+'_'+Math.random().toString(36).slice(2),name:trimmed,archived:false,created_at:new Date().toISOString()});
+  saveChantiers();
+  const items=savedData.filter(d=>d.project_name===ch.name);
+  const now=new Date().toISOString();
+  items.forEach((it,i)=>{
+    savedData.push({id:Date.now()+'_'+i+'_'+Math.random().toString(36).slice(2),network_type:it.network_type,item_key:it.item_key,diameter:it.diameter,quantity:it.quantity,project_name:trimmed,received:true,created_at:now});
+  });
+  save();renderChantiers();
+  showToast(`Liste dupliquee (${items.length} article${items.length>1?'s':''})`);
+}
+function filterChantiers(val){chantierSearchQuery=val;renderChantiers()}
+function setChantierTab(showArchived){
+  chantierShowArchived=showArchived;
+  document.getElementById('tab-actifs').classList.toggle('active',!showArchived);
+  document.getElementById('tab-archives').classList.toggle('active',showArchived);
+  renderChantiers();
+}
+function viewChantierList(name){currentListFilter=name;showView('lists');renderList()}
+function clearListFilter(){
+  currentListFilter='';
+  const siteInput=document.getElementById('site-number');
+  if(siteInput)siteInput.value='';
+  renderList();
+}
+function enterChantier(name){
+  currentChantier=name;
+  updateActiveChantierBanner();
+  showView('networks');
+  showToast(`Chantier actif : ${name}`);
+}
+function exitChantier(){
+  currentChantier='';
+  updateActiveChantierBanner();
+  showToast('Mode "sans chantier"');
+}
+function updateActiveChantierBanner(){
+  const banner=document.getElementById('active-chantier-banner');
+  const text=document.getElementById('active-chantier-text');
+  if(currentChantier){
+    banner.style.display='flex';
+    text.textContent=`🏗️ Chantier actif : ${currentChantier}`;
+  }else{
+    banner.style.display='none';
+  }
+}
+function renderChantiers(){
+  const list=document.getElementById('chantiers-list');const empty=document.getElementById('chantiers-empty');
+  if(!chantiers.length){list.innerHTML='';empty.style.display='block';empty.querySelector('p').textContent='Aucun chantier cree pour le moment';return}
+  const q=normalizeStr(chantierSearchQuery);
+  let filtered=chantiers.filter(c=>!!c.archived===chantierShowArchived);
+  if(q){
+    filtered=filtered.filter(c=>normalizeStr(c.name).includes(q));
+  }else if(!chantierShowArchived){
+    // Sans recherche : n'afficher que les chantiers deja travailles (ou actif, ou cree manuellement)
+    filtered=filtered.filter(c=>{
+      const hasItems=savedData.some(d=>d.project_name===c.name);
+      const isActive=c.name===currentChantier;
+      const isCustom=!c.fromCatalog;
+      return hasItems||isActive||isCustom;
+    });
+  }
+  if(!filtered.length){
+    list.innerHTML='';empty.style.display='block';
+    if(q){
+      empty.querySelector('p').textContent=`Aucun chantier trouve pour "${chantierSearchQuery}"`;
+    }else if(chantierShowArchived){
+      empty.querySelector('p').textContent='Aucun chantier archive';
+    }else{
+      empty.querySelector('p').textContent='Aucun chantier en cours - recherchez un code chantier ci-dessus pour demarrer';
+    }
+    return;
+  }
+  empty.style.display='none';list.innerHTML='';
+  filtered.slice().sort((a,b)=>{
+    const ka=chantierSortKey(a),kb=chantierSortKey(b);
+    if(ka!==null&&kb!==null)return kb-ka;
+    if(ka!==null)return -1;
+    if(kb!==null)return 1;
+    return new Date(b.created_at)-new Date(a.created_at);
+  }).forEach(ch=>{
+    const count=savedData.filter(d=>d.project_name===ch.name).length;
+    const isActive=ch.name===currentChantier;
+    const card=document.createElement('div');card.className='chantier-card'+(isActive?' active':'');
+    const safeName=ch.name.replace(/'/g,"\\'");
+    card.innerHTML=`<div class="chantier-info"><div class="chantier-name">${isActive?'✓ ':''}${ch.name}</div><div class="chantier-meta">${count} article${count>1?'s':''}</div></div>
+      <div class="chantier-actions">
+        ${ch.archived?'':`<button class="add-mat-btn" onclick="enterChantier('${safeName}')">+ Ajouter du materiel</button>`}
+        <button onclick="viewChantierList('${safeName}')">Voir la liste</button>
+        <button onclick="renameChantier('${ch.id}')">Renommer</button>
+        <button onclick="duplicateChantier('${ch.id}')">Dupliquer</button>
+        <button onclick="toggleArchiveChantier('${ch.id}')">${ch.archived?'Desarchiver':'Archiver'}</button>
+        <button class="del-chantier" onclick="deleteChantier('${ch.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>`;
+    list.appendChild(card);
+  });
+}
+function chantierSortKey(ch){
+  const m=ch.name.match(/^[A-Za-z](\d{2})-(\d+)/);
+  if(!m)return null;
+  return parseInt(m[1],10)*1000000+parseInt(m[2],10);
+}
+function renderProjectSelect(){
+  const sel=document.getElementById('project-name');
+  sel.innerHTML='';
+  const optNone=document.createElement('option');optNone.value='';optNone.textContent='Sans chantier (optionnel)';sel.appendChild(optNone);
+  chantiers.filter(c=>!c.archived).sort((a,b)=>{
+    const ka=chantierSortKey(a),kb=chantierSortKey(b);
+    if(ka!==null&&kb!==null)return kb-ka;
+    if(ka!==null)return -1;
+    if(kb!==null)return 1;
+    return new Date(b.created_at)-new Date(a.created_at);
+  }).forEach(c=>{const o=document.createElement('option');o.value=c.name;o.textContent=c.name;sel.appendChild(o)});
+  const optNew=document.createElement('option');optNew.value='__new__';optNew.textContent='+ Nouveau chantier...';sel.appendChild(optNew);
+}
+function handleProjectSelectChange(sel){
+  if(sel.value==='__new__'){
+    const name=window.prompt('Nom du nouveau chantier :');
+    if(name&&name.trim()){
+      const trimmed=name.trim();
+      if(!chantiers.some(c=>normalizeStr(c.name)===normalizeStr(trimmed))){
+        chantiers.push({id:Date.now()+'_'+Math.random().toString(36).slice(2),name:trimmed,archived:false,created_at:new Date().toISOString()});
+        saveChantiers();
+      }
+      renderProjectSelect();sel.value=trimmed;currentChantier=trimmed;
+    }else{sel.value=currentChantier||''}
+  }else{
+    currentChantier=sel.value;
+  }
+}
+
+// ===== NETWORKS =====
+function renderNetworks(){
+  const g=document.getElementById('networks-grid');g.innerHTML='';
+  NETWORKS.forEach(n=>{
+    const c=document.createElement('button');c.className='net-card';
+    c.innerHTML=`<div class="net-icon">${n.icon}</div><div class="net-name">${n.name}</div><div class="net-desc">${n.desc}</div>`;
+    c.onclick=()=>selectNet(n.id);g.appendChild(c);
+  });
+}
+function selectNet(id){
+  currentNet=id;selectedItems={};
+  const net=NETWORKS.find(n=>n.id===id);
+  document.getElementById('mat-title').textContent=net.name;
+  renderProjectSelect();
+  document.getElementById('project-name').value=currentChantier||'';
+  renderMaterials();showView('materials');
+}
+
+// ===== RECHERCHE GLOBALE (floue, tolerante aux fautes) =====
+let SEARCH_INDEX=null;
+function normalizeStr(s){return (s||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim()}
+function tokenize(s){return normalizeStr(s).split(/[^a-z0-9]+/).filter(Boolean)}
+function levenshtein(a,b){
+  if(a===b)return 0;
+  const al=a.length,bl=b.length;
+  if(al===0)return bl;if(bl===0)return al;
+  let prev=new Array(bl+1);for(let j=0;j<=bl;j++)prev[j]=j;
+  for(let i=1;i<=al;i++){
+    const cur=[i];
+    for(let j=1;j<=bl;j++){
+      const cost=a[i-1]===b[j-1]?0:1;
+      cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+cost);
+    }
+    prev=cur;
+  }
+  return prev[bl];
+}
+function maxAllowedDist(len){if(len<=3)return 0;if(len<=6)return 1;return 2}
+function buildSearchIndex(){
+  const idx=[];
+  NETWORKS.forEach(net=>{
+    const cats=MATERIALS[net.id];if(!cats)return;
+    Object.entries(cats).forEach(([catName,items])=>{
+      items.forEach(item=>{
+        const fullText=`${item.name} ${catName} ${net.name}`;
+        idx.push({netId:net.id,netName:net.name,netIcon:net.icon,catName,itemName:item.name,diameters:item.diameters,tokens:tokenize(fullText)});
+      });
+    });
+  });
+  return idx;
+}
+function tokenMatchScore(qToken,targetTokens){
+  // exact/prefix/substring match = 2pts, fuzzy (typo) match = 1pt, no match = 0
+  let best=0;
+  for(const t of targetTokens){
+    if(t===qToken){best=Math.max(best,3);continue}
+    if(t.startsWith(qToken)||t.includes(qToken)){best=Math.max(best,2);continue}
+    const dist=levenshtein(qToken,t);
+    if(dist<=maxAllowedDist(qToken.length))best=Math.max(best,1);
+  }
+  return best;
+}
+function searchMatches(query){
+  const qTokens=tokenize(query);
+  if(!qTokens.length)return[];
+  if(!SEARCH_INDEX)SEARCH_INDEX=buildSearchIndex();
+  const results=[];
+  SEARCH_INDEX.forEach(entry=>{
+    let total=0,allMatched=true;
+    for(const qt of qTokens){
+      const sc=tokenMatchScore(qt,entry.tokens);
+      const dScore=entry.diameters.some(d=>normalizeStr(d).includes(qt))?2:0;
+      const s=Math.max(sc,dScore);
+      if(s===0){allMatched=false;break}
+      total+=s;
+    }
+    if(allMatched)results.push({entry,score:total});
+  });
+  results.sort((a,b)=>b.score-a.score||a.entry.itemName.localeCompare(b.entry.itemName));
+  return results.map(r=>r.entry);
+}
+function handleSearchInput(val){
+  const grid=document.getElementById('networks-grid');
+  const results=document.getElementById('search-results');
+  const label=document.getElementById('networks-label');
+  const clearBtn=document.getElementById('search-clear');
+  clearBtn.style.display=val?'block':'none';
+  if(!val.trim()){grid.style.display='';label.style.display='';results.style.display='none';results.innerHTML='';return}
+  const matches=searchMatches(val);
+  grid.style.display='none';label.style.display='none';results.style.display='block';
+  renderSearchResults(matches,val);
+}
+function clearSearch(){
+  document.getElementById('global-search').value='';
+  handleSearchInput('');
+}
+function renderSearchResults(matches,q){
+  const results=document.getElementById('search-results');
+  if(!matches.length){results.innerHTML=`<div class="search-empty"><p>Aucun résultat pour "${q}"</p></div>`;return}
+  const limited=matches.slice(0,50);
+  results.innerHTML='';
+  limited.forEach(m=>{
+    const row=document.createElement('div');row.className='mat-row search-row';
+    const diamsHTML=m.diameters.map(d=>{
+      const sd=d.replace(/'/g,"\\'");const sn=m.itemName.replace(/'/g,"\\'");
+      return `<div class="diam-chip search-chip" onclick="quickAddSearch('${m.netId}','${sn}','${sd}',this)">
+        <span class="diam-label">${d}</span>
+      </div>`;
+    }).join('');
+    row.innerHTML=`<div class="search-meta">${m.netIcon} ${m.netName} · ${m.catName}</div><div class="mat-name">${m.itemName}</div><div class="diams">${diamsHTML}</div>`;
+    results.appendChild(row);
+  });
+  if(matches.length>limited.length){
+    const more=document.createElement('div');more.className='search-more';
+    more.textContent=`+ ${matches.length-limited.length} autre${matches.length-limited.length>1?'s':''} résultat${matches.length-limited.length>1?'s':''} — affinez votre recherche`;
+    results.appendChild(more);
+  }
+}
+function quickAddSearch(netId,name,dia,chipEl){
+  const net=NETWORKS.find(n=>n.id===netId);if(!net)return;
+  savedData.push({id:Date.now()+'_'+Math.random().toString(36).slice(2),network_type:net.name,item_key:name,diameter:dia,quantity:1,project_name:'',received:true,created_at:new Date().toISOString()});
+  save();
+  showToast(`Ajouté : ${name} (${dia})`);
+  if(chipEl){chipEl.classList.add('quick-added');setTimeout(()=>chipEl.classList.remove('quick-added'),500)}
+}
+
+// ===== MATERIALS =====
+function renderMaterials(){
+  const cats=MATERIALS[currentNet];const container=document.getElementById('mat-categories');container.innerHTML='';
+  if(!cats)return;
+  Object.entries(cats).forEach(([catName,items])=>{
+    const block=document.createElement('div');block.className='cat-block';
+    const hdr=document.createElement('button');hdr.className='cat-header';
+    hdr.innerHTML=`<span class="cat-name">${catName}</span><span class="cat-arrow">▼</span>`;
+    const content=document.createElement('div');content.className='cat-items';
+    items.forEach((item,idx)=>{
+      const key=`${currentNet}__${catName}__${idx}`;
+      const row=document.createElement('div');row.className='mat-row';
+      let diamsHTML=item.diameters.map(d=>{
+        const k=`${key}__${d}`;
+        const sn=item.name.replace(/'/g,"\\'");const sd=d.replace(/'/g,"\\'");
+        return `<div class="diam-chip" data-k="${k}" onclick="toggleChip(this,'${k}','${sn}','${sd}')">
+          <input type="checkbox" onchange="event.stopPropagation();toggleChip(this.closest('.diam-chip'),'${k}','${sn}','${sd}')">
+          <span class="diam-label">${d}</span>
+          <input type="number" class="qty-input" min="1" value="1" onclick="event.stopPropagation()" onchange="updateQty('${k}',this.value)">
+        </div>`;
+      }).join('');
+      row.innerHTML=`<div class="mat-name">${item.name}</div><div class="diams">${diamsHTML}</div>`;
+      content.appendChild(row);
+    });
+    const customRow=document.createElement('div');customRow.className='custom-row';
+    customRow.innerHTML=`<div class="mat-name">+ Autre materiel</div>
+      <div class="custom-input-row">
+        <input type="text" placeholder="Nom du materiel" data-cat="${catName}" style="margin:0">
+        <button class="custom-add-btn" onclick="addCustom('${catName}')">Ajouter</button>
+      </div>
+      <div class="custom-chips" data-custom-list="${catName}"></div>`;
+    content.appendChild(customRow);
+    hdr.onclick=()=>{const open=content.classList.toggle('open');hdr.querySelector('.cat-arrow').classList.toggle('open',open)};
+    block.appendChild(hdr);block.appendChild(content);container.appendChild(block);
+  });
+  updateAddBtn();
+}
+function toggleChip(chip,key,name,dia){
+  const cb=chip.querySelector('input[type=checkbox]');const qty=chip.querySelector('.qty-input');
+  if(cb.checked){chip.classList.remove('selected');cb.checked=false;qty.style.display='none';delete selectedItems[key]}
+  else{chip.classList.add('selected');cb.checked=true;qty.style.display='inline-block';selectedItems[key]={name,diameter:dia,quantity:parseInt(qty.value)||1}}
+  updateAddBtn();
+}
+function updateQty(key,val){if(selectedItems[key])selectedItems[key].quantity=Math.max(1,parseInt(val)||1)}
+function addCustom(catName){
+  const inp=document.querySelector(`[data-cat="${catName}"]`);const name=inp.value.trim();
+  if(!name){showToast('Entrez un nom','err');return}
+  const k=`custom__${currentNet}__${catName}__${Date.now()}`;
+  selectedItems[k]={name,diameter:'standard',quantity:1};
+  const list=document.querySelector(`[data-custom-list="${catName}"]`);
+  const chip=document.createElement('div');chip.className='custom-chip';chip.dataset.k=k;
+  chip.innerHTML=`<span>${name}</span><input type="number" min="1" value="1" onchange="updateQty('${k}',this.value)"><button onclick="removeCustom('${k}')">x</button>`;
+  list.appendChild(chip);inp.value='';updateAddBtn();showToast('Ajoute !');
+}
+function removeCustom(k){delete selectedItems[k];document.querySelector(`[data-k="${k}"]`)?.remove();updateAddBtn()}
+function updateAddBtn(){
+  const n=Object.keys(selectedItems).length;const btn=document.getElementById('btn-add');btn.disabled=n===0;
+  document.getElementById('btn-add-text').textContent=n>0?`Ajouter ${n} element${n>1?'s':''} a la liste`:'Ajouter a la liste';
+}
+function addToList(){
+  const items=Object.values(selectedItems);if(!items.length)return;
+  const net=NETWORKS.find(n=>n.id===currentNet);const proj=document.getElementById('project-name').value.trim();
+  const now=new Date().toISOString();
+  items.forEach(item=>{savedData.push({id:Date.now()+'_'+Math.random().toString(36).slice(2),network_type:net.name,item_key:item.name,diameter:item.diameter,quantity:item.quantity,project_name:proj,received:true,created_at:now})});
+  save();selectedItems={};showToast(`${items.length} element${items.length>1?'s':''} ajoute${items.length>1?'s':''} !`);goHome();
+}
+
+// ===== LIST =====
+function renderList(){
+  const container=document.getElementById('saved-items');const empty=document.getElementById('empty-list');const extras=document.getElementById('list-extras');
+  const titleEl=document.getElementById('lists-title');const chip=document.getElementById('list-filter-chip');const chipText=document.getElementById('list-filter-text');
+  const siteInput=document.getElementById('site-number');
+  const summary=document.getElementById('reception-summary');const rsText=document.getElementById('rs-text');
+  if(currentListFilter){
+    titleEl.textContent='Chantier';
+    chip.style.display='flex';chipText.textContent=`🏗️ ${currentListFilter}`;
+    if(siteInput)siteInput.value=currentListFilter;
+  }else{
+    titleEl.textContent='Liste de materiel';
+    chip.style.display='none';
+  }
+  const data=getFilteredData();
+  if(data.length===0){
+    container.innerHTML='';extras.style.display='none';summary.style.display='none';
+    empty.style.display='block';
+    empty.querySelector('p').textContent=currentListFilter?`Aucun materiel pour "${currentListFilter}"`:'Aucun materiel pour le moment';
+    return;
+  }
+  empty.style.display='none';extras.style.display='block';
+  const missingCount=data.filter(d=>!d.received).length;
+  summary.style.display='flex';
+  if(missingCount===0){
+    rsText.innerHTML='✅ <span class="rs-count complete" id="rs-count">Tout est recu</span>';
+  }else{
+    rsText.innerHTML=`⚠️ <span class="rs-count incomplete" id="rs-count">${missingCount}</span> manquant${missingCount>1?'s':''}`;
+  }
+  const grouped={};data.forEach(it=>{const k=it.network_type||'Autre';if(!grouped[k])grouped[k]=[];grouped[k].push(it)});
+  container.innerHTML='';
+  Object.entries(grouped).forEach(([net,items])=>{
+    const sec=document.createElement('div');sec.className='list-group';
+    sec.innerHTML=`<div class="list-group-title">${net}</div>`;
+    items.forEach(it=>{
+      const row=document.createElement('div');row.className='list-item'+(!it.received?' missing':'');
+      row.innerHTML=`<button class="missing-btn${!it.received?' flagged':''}" onclick="toggleReceived('${it.id}')" title="${it.received?'Signaler comme manquant':'Marquer comme recu'}">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="12" height="12"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <div class="list-item-info"><div class="list-item-name">${it.item_key}</div><div class="list-item-meta">${it.diameter}${it.project_name&&!currentListFilter?' · '+it.project_name:''}</div></div>
+      <div class="qty-ctrl"><button onclick="changeQty('${it.id}',-1)">-</button><span class="qty-val" id="qty-${it.id}">${it.quantity}</span><button onclick="changeQty('${it.id}',1)">+</button></div>
+      <button class="del-btn" onclick="deleteItem('${it.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>`;
+      sec.appendChild(row);
+    });
+    container.appendChild(sec);
+  });
+}
+function toggleReceived(id){
+  const it=savedData.find(d=>d.id===id);if(!it)return;
+  it.received=!it.received;save();renderList();
+}
+function changeQty(id,delta){
+  const it=savedData.find(d=>d.id===id);if(!it)return;
+  it.quantity=Math.max(1,it.quantity+delta);const el=document.getElementById('qty-'+id);if(el)el.textContent=it.quantity;save();
+}
+function deleteItem(id){savedData=savedData.filter(d=>d.id!==id);save();renderList();showToast('Supprime')}
+
+// ===== RAPPORT RECEPTION (manquants) =====
+function generateMissingText(){
+  const data=getFilteredData().filter(d=>!d.received);
+  const grouped={};data.forEach(it=>{const k=it.network_type||'Autre';if(!grouped[k])grouped[k]=[];grouped[k].push(it)});
+  const now=new Date();
+  let t='ARTICLES NON RECUS - CISEPZ\n'+'='.repeat(40)+'\n';
+  if(currentListFilter)t+=`Chantier: ${currentListFilter}\n`;
+  t+=`Date: ${now.toLocaleDateString('fr-FR')} a ${now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}\n`;
+  t+=`Total manquant: ${data.length} article${data.length>1?'s':''}\n\n`;
+  Object.entries(grouped).forEach(([net,items])=>{
+    t+=`${net}:\n`;
+    items.forEach(it=>{t+=`  - ${it.item_key} / ${it.diameter} / x${it.quantity}\n`});
+    t+='\n';
+  });
+  t+='Merci de verifier et completer la livraison.\n';
+  return t;
+}
+function showMissingReport(){
+  const missing=getFilteredData().filter(d=>!d.received);
+  if(!missing.length){showToast('Tout a ete recu !');return}
+  document.getElementById('missing-count-text').textContent=`${missing.length} article${missing.length>1?'s':''} non recu${missing.length>1?'s':''}`;
+  document.getElementById('missing-report-text').textContent=generateMissingText();
+  document.getElementById('modal-missing-report').classList.add('open');
+}
+function closeMissingReport(){document.getElementById('modal-missing-report').classList.remove('open')}
+function copyMissingReport(){
+  navigator.clipboard.writeText(generateMissingText()).then(()=>showToast('Copie !')).catch(()=>showToast('Erreur copie','err'));
+}
+function sendMissingWhatsApp(){
+  window.open(`https://wa.me/?text=${encodeURIComponent(generateMissingText())}`,'_blank');
+}
+async function sendMissingEmail(){
+  const missing=getFilteredData().filter(d=>!d.received);
+  if(!missing.length){showToast('Tout a ete recu !');return}
+  if(!window.jspdf||!window.jspdf.jsPDF){showToast('Bibliotheque PDF non chargee - verifiez votre connexion','err');return}
+  try{
+    const sub=`Manquants livraison CISEPZ${currentListFilter?' - '+currentListFilter:''}`;
+    const dateStr=new Date().toISOString().split('T')[0];
+    const suffix=currentListFilter?'_'+currentListFilter.replace(/[^a-zA-Z0-9]/g,'_'):'';
+    const filename=`Manquants_CISEPZ${suffix}_${dateStr}.pdf`;
+    const doc=generateMissingPDF();
+    const result=await shareOrDownloadPDF(doc,filename,sub,generateMissingText());
+    if(result==='shared')showToast('PDF partage !');
+    else if(result==='fallback')showToast('PDF telecharge - joignez-le a votre email');
+  }catch(e){console.error(e);showToast('Erreur PDF','err')}
+}
+function generateMissingPDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,margin=14;
+  const data=getFilteredData().filter(d=>!d.received);
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('fr-FR');
+  const timeStr=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+
+  // ── HEADER BAR (rouge = alerte manquants) ──
+  doc.setFillColor(248,214,212);
+  doc.rect(0,0,W,28,'F');
+  doc.setFillColor(0,0,0);
+  doc.rect(0,28,W,1.5,'F');
+
+  doc.addImage(CISEPZ_LOGO_PDF,'PNG',margin,7,66,11);
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(0,0,0);
+  doc.text('ARTICLES NON RECUS',W-margin,13,{align:'right'});
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(60,60,60);
+  if(currentListFilter)doc.text(`Chantier: ${currentListFilter}`,W-margin,19,{align:'right'});
+  doc.text(`Genere le ${dateStr} a ${timeStr}`,W-margin,24,{align:'right'});
+
+  let y=36;
+
+  // ── TOTAL ──
+  doc.setFillColor(253,236,235);
+  doc.roundedRect(margin,y,W-margin*2,10,2,2,'F');
+  doc.setDrawColor(200,60,55);doc.setLineWidth(.3);
+  doc.roundedRect(margin,y,W-margin*2,10,2,2,'S');
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(160,30,25);
+  doc.text(`TOTAL MANQUANT : ${data.length} article${data.length>1?'s':''}`,margin+3,y+6.5);
+  y+=16;
+
+  const pageH=297;const bottomMargin=20;
+
+  if(!data.length){
+    doc.setFont('helvetica','italic');doc.setFontSize(9);doc.setTextColor(100,100,100);
+    doc.text('Tous les articles ont ete recus.',margin+3,y);
+  }else{
+    const grouped={};data.forEach(it=>{const k=it.network_type||'Autre';if(!grouped[k])grouped[k]=[];grouped[k].push(it)});
+    Object.entries(grouped).forEach(([net,items])=>{
+      if(y>pageH-bottomMargin-20){doc.addPage();y=20}
+      doc.setFillColor(13,17,23);
+      doc.rect(margin,y,W-margin*2,7,'F');
+      doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(242,245,248);
+      doc.text(net.toUpperCase(),margin+3,y+4.8);
+      y+=10;
+      doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(40,40,40);
+      items.forEach(it=>{
+        if(y>pageH-bottomMargin-8){doc.addPage();y=20}
+        doc.text(`☐ ${it.item_key}`,margin+3,y);
+        doc.setFont('helvetica','bold');
+        doc.text(`Ø${it.diameter}  x${it.quantity}`,W-margin-3,y,{align:'right'});
+        doc.setFont('helvetica','normal');
+        y+=6;
+      });
+      y+=3;
+    });
+  }
+
+  y+=6;
+  if(y<pageH-bottomMargin-14){
+    doc.setFont('helvetica','italic');doc.setFontSize(8);doc.setTextColor(100,100,100);
+    doc.text('Merci de verifier et completer la livraison.',margin+3,y);
+  }
+
+  const pageCount=doc.internal.getNumberOfPages();
+  for(let i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    doc.setFillColor(13,17,23);
+    doc.rect(0,289,W,8,'F');
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(242,245,248);
+    doc.text('cisepz.fr',W/2,293,{align:'center'});
+    doc.text(`Page ${i}/${pageCount}`,W-margin,293,{align:'right'});
+  }
+  return doc;
+}
+function downloadMissingPDF(){
+  const missing=getFilteredData().filter(d=>!d.received);
+  if(!missing.length){showToast('Tout a ete recu !');return}
+  if(!window.jspdf||!window.jspdf.jsPDF){showToast('Bibliotheque PDF non chargee - verifiez votre connexion','err');return}
+  try{
+    const doc=generateMissingPDF();
+    const dateStr=new Date().toISOString().split('T')[0];
+    const suffix=currentListFilter?'_'+currentListFilter.replace(/[^a-zA-Z0-9]/g,'_'):'';
+    doc.save(`Manquants_CISEPZ${suffix}_${dateStr}.pdf`);
+    showToast('PDF manquants telecharge !');
+  }catch(e){console.error(e);showToast('Erreur PDF','err')}
+}
+document.getElementById('modal-missing-report').addEventListener('click',function(e){
+  if(e.target===this)closeMissingReport();
+});
+function confirmClear(){document.getElementById('btn-clear').style.display='none';document.getElementById('confirm-row').style.display='flex'}
+function cancelClear(){document.getElementById('btn-clear').style.display='flex';document.getElementById('confirm-row').style.display='none'}
+function clearAll(){
+  if(currentListFilter){savedData=savedData.filter(d=>d.project_name!==currentListFilter)}
+  else{savedData=[]}
+  save();cancelClear();renderList();showToast('Liste videe')
+}
+
+// ===== PDF GENERATION =====
+function getDeliveryInfo(){
+  return {
+    companion:document.getElementById('companion-name').value.trim(),
+    site:document.getElementById('site-number').value.trim(),
+    date:document.getElementById('delivery-date').value,
+    location:document.getElementById('delivery-location').value
+  };
+}
+
+function generatePDF(){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,margin=14;
+  const info=getDeliveryInfo();
+  const data=getFilteredData();
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('fr-FR');
+  const timeStr=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+
+  // ── HEADER BAR ──
+  doc.setFillColor(184,228,244); // bleu CISEPZ
+  doc.rect(0,0,W,28,'F');
+  doc.setFillColor(0,0,0);
+  doc.rect(0,28,W,1.5,'F');
+
+  doc.addImage(CISEPZ_LOGO_PDF,'PNG',margin,7,66,11);
+
+  // Title right
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(11);
+  doc.setTextColor(0,0,0);
+  doc.text('LISTE DE MATERIEL',W-margin,13,{align:'right'});
+  doc.setFont('helvetica','normal');
+  doc.setFontSize(8);
+  doc.setTextColor(60,60,60);
+  doc.text('Preparation chantier',W-margin,19,{align:'right'});
+  doc.text(`Genere le ${dateStr} a ${timeStr}`,W-margin,24,{align:'right'});
+
+  let y=36;
+
+  // ── INFO LIVRAISON ──
+  const hasInfo=info.companion||info.site||info.date||info.location;
+  if(hasInfo){
+    doc.setFillColor(13,17,23);
+    doc.rect(margin,y,W-margin*2,0.8,'F');
+    y+=4;
+    doc.setFont('helvetica','bold');doc.setFontSize(8);doc.setTextColor(13,17,23);
+    doc.text('INFORMATIONS DE LIVRAISON',margin,y);
+    y+=5;
+    doc.setFont('helvetica','normal');doc.setFontSize(8.5);doc.setTextColor(40,40,40);
+    const cols=[];
+    if(info.companion)cols.push(`Compagnon: ${info.companion}`);
+    if(info.site)cols.push(`N° chantier: ${info.site}`);
+    if(info.date)cols.push(`Date: ${new Date(info.date).toLocaleDateString('fr-FR')}`);
+    if(info.location)cols.push(`Lieu: ${info.location}`);
+    // 2 per row
+    for(let i=0;i<cols.length;i+=2){
+      doc.text(cols[i],margin,y);
+      if(cols[i+1])doc.text(cols[i+1],W/2,y);
+      y+=5.5;
+    }
+    y+=2;
+  }
+
+  // ── TOTAUX ──
+  doc.setFillColor(248,248,248);
+  doc.roundedRect(margin,y,W-margin*2,10,2,2,'F');
+  doc.setFont('helvetica','bold');doc.setFontSize(9);doc.setTextColor(0,0,0);
+  doc.text(`TOTAL: ${data.length} element${data.length>1?'s':''}`,margin+3,y+6.5);
+  const nets=[...new Set(data.map(d=>d.network_type))];
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(100,100,100);
+  doc.text(`${nets.length} type${nets.length>1?'s':''} de reseau`,W-margin-3,y+6.5,{align:'right'});
+  y+=16;
+
+  // ── ITEMS PAR RESEAU ──
+  const grouped={};
+  data.forEach(it=>{const k=it.network_type||'Autre';if(!grouped[k])grouped[k]=[];grouped[k].push(it)});
+
+  const pageH=297;const bottomMargin=20;
+
+  Object.entries(grouped).forEach(([net,items])=>{
+    // Check page break for header
+    if(y>pageH-bottomMargin-20){doc.addPage();y=20}
+
+    // Network title band
+    doc.setFillColor(13,17,23);
+    doc.rect(margin,y,W-margin*2,7,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(8.5);doc.setTextColor(242,245,248);
+    doc.text(net.toUpperCase(),margin+3,y+5);
+    doc.setTextColor(180,228,244);doc.setFont('helvetica','normal');doc.setFontSize(7.5);
+    doc.text(`${items.length} article${items.length>1?'s':''}`,W-margin-3,y+5,{align:'right'});
+    y+=9;
+
+    // Table header
+    doc.setFillColor(33,38,45);
+    doc.rect(margin,y,W-margin*2,5.5,'F');
+    doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(139,148,158);
+    doc.text('DESIGNATION',margin+3,y+3.8);
+    doc.text('DIAM.',margin+100,y+3.8);
+    doc.text('QTE',margin+130,y+3.8);
+    doc.text('CHANTIER',margin+145,y+3.8);
+    y+=7;
+
+    items.forEach((it,idx)=>{
+      if(y>pageH-bottomMargin){doc.addPage();y=20}
+      // Alternating rows
+      if(idx%2===0){doc.setFillColor(22,27,34)}
+      else{doc.setFillColor(26,31,38)}
+      doc.rect(margin,y,W-margin*2,5.5,'F');
+
+      doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(230,237,243);
+      const nameStr=it.item_key.length>40?it.item_key.substring(0,38)+'...':it.item_key;
+      doc.text(nameStr,margin+3,y+3.8);
+
+      doc.setTextColor(242,245,248);doc.setFont('helvetica','bold');doc.setFontSize(7.5);
+      doc.text(String(it.diameter),margin+100,y+3.8);
+
+      doc.setTextColor(230,237,243);doc.setFont('helvetica','bold');doc.setFontSize(8);
+      doc.text(`x${it.quantity}`,margin+130,y+3.8);
+
+      if(it.project_name){
+        doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(139,148,158);
+        const proj=it.project_name.length>18?it.project_name.substring(0,16)+'...':it.project_name;
+        doc.text(proj,margin+145,y+3.8);
+      }
+      y+=5.5;
+    });
+    y+=6;
+  });
+
+  // ── FOOTER ──
+  const totalPages=doc.getNumberOfPages();
+  for(let i=1;i<=totalPages;i++){
+    doc.setPage(i);
+    doc.setFillColor(13,17,23);
+    doc.rect(0,287,W,10,'F');
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(139,148,158);
+    doc.text('Liste By Cisepz - Genie Climatique',margin,293);
+    doc.text(`Page ${i}/${totalPages}`,W-margin,293,{align:'right'});
+    doc.setTextColor(242,245,248);
+    doc.text('cisepz.fr',W/2,293,{align:'center'});
+  }
+
+  return doc;
+}
+
+function downloadPDF(){
+  if(!getFilteredData().length){showToast('Liste vide','err');return}
+  if(!window.jspdf||!window.jspdf.jsPDF){showToast('Bibliotheque PDF non chargee - verifiez votre connexion','err');return}
+  try{
+    const doc=generatePDF();
+    const dateStr=new Date().toISOString().split('T')[0];
+    doc.save(`Liste_Materiel_CISEPZ_${dateStr}.pdf`);
+    showToast('PDF telecharge !');
+  }catch(e){console.error(e);showToast('Erreur PDF','err')}
+}
+
+// ===== EXPORT MULTI-CHANTIERS =====
+function openMultiExportModal(){
+  if(!chantiers.length){showToast('Aucun chantier cree','err');return}
+  const list=document.getElementById('multi-export-list');list.innerHTML='';
+  chantiers.slice().sort((a,b)=>new Date(b.created_at)-new Date(a.created_at)).forEach(ch=>{
+    const count=savedData.filter(d=>d.project_name===ch.name).length;
+    const row=document.createElement('label');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:8px;margin-bottom:6px;cursor:pointer';
+    row.innerHTML=`<input type="checkbox" class="multi-chantier-check" value="${ch.name.replace(/"/g,'&quot;')}" style="width:16px;height:16px;accent-color:var(--amber);flex-shrink:0">
+      <span style="flex:1;font-size:13px">${ch.name}${ch.archived?' <span style="color:var(--muted);font-size:10px">(archive)</span>':''}</span>
+      <span style="font-size:11px;color:var(--muted);font-family:'JetBrains Mono',monospace">${count} art.</span>`;
+    list.appendChild(row);
+  });
+  document.getElementById('modal-multi-export').classList.add('open');
+}
+function closeMultiExportModal(){document.getElementById('modal-multi-export').classList.remove('open')}
+document.getElementById('modal-multi-export').addEventListener('click',function(e){if(e.target===this)closeMultiExportModal()});
+function generateMultiPDF(selectedNames){
+  const {jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'a4'});
+  const W=210,margin=14;
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('fr-FR');
+  const timeStr=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+
+  doc.setFillColor(184,228,244);
+  doc.rect(0,0,W,28,'F');
+  doc.setFillColor(0,0,0);
+  doc.rect(0,28,W,1.5,'F');
+  doc.addImage(CISEPZ_LOGO_PDF,'PNG',margin,7,66,11);
+  doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(0,0,0);
+  doc.text('LISTE CONSOLIDEE MULTI-CHANTIERS',W-margin,13,{align:'right'});
+  doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(60,60,60);
+  doc.text(`${selectedNames.length} chantier${selectedNames.length>1?'s':''}`,W-margin,19,{align:'right'});
+  doc.text(`Genere le ${dateStr} a ${timeStr}`,W-margin,24,{align:'right'});
+
+  let y=36;
+  const pageH=297;const bottomMargin=20;
+
+  selectedNames.forEach(chName=>{
+    const items=savedData.filter(d=>d.project_name===chName);
+    if(y>pageH-bottomMargin-24){doc.addPage();y=20}
+    doc.setFillColor(242,245,248);
+    doc.roundedRect(margin,y,W-margin*2,9,2,2,'F');
+    doc.setDrawColor(13,17,23);doc.setLineWidth(.3);
+    doc.roundedRect(margin,y,W-margin*2,9,2,2,'S');
+    doc.setFont('helvetica','bold');doc.setFontSize(10);doc.setTextColor(13,17,23);
+    doc.text(`CHANTIER : ${chName}`,margin+3,y+6);
+    doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(100,100,100);
+    doc.text(`${items.length} article${items.length>1?'s':''}`,W-margin-3,y+6,{align:'right'});
+    y+=13;
+    if(!items.length){
+      doc.setFont('helvetica','italic');doc.setFontSize(8.5);doc.setTextColor(140,140,140);
+      doc.text('Aucun article pour ce chantier.',margin+3,y);
+      y+=8;
+    }else{
+      const grouped={};items.forEach(it=>{const k=it.network_type||'Autre';if(!grouped[k])grouped[k]=[];grouped[k].push(it)});
+      Object.entries(grouped).forEach(([net,its])=>{
+        if(y>pageH-bottomMargin-16){doc.addPage();y=20}
+        doc.setFillColor(230,237,243);
+        doc.rect(margin,y,W-margin*2,6,'F');
+        doc.setFont('helvetica','bold');doc.setFontSize(7.5);doc.setTextColor(13,17,23);
+        doc.text(net.toUpperCase(),margin+3,y+4.2);
+        y+=8;
+        doc.setFont('helvetica','normal');doc.setFontSize(8);doc.setTextColor(40,40,40);
+        its.forEach(it=>{
+          if(y>pageH-bottomMargin-8){doc.addPage();y=20}
+          const missingMark=!it.received?'[MANQUANT] ':'';
+          doc.text(`- ${missingMark}${it.item_key}`,margin+3,y);
+          doc.setFont('helvetica','bold');
+          doc.text(`O${it.diameter}  x${it.quantity}`,W-margin-3,y,{align:'right'});
+          doc.setFont('helvetica','normal');
+          y+=5.5;
+        });
+        y+=2;
+      });
+    }
+    y+=4;
+  });
+
+  const pageCount=doc.internal.getNumberOfPages();
+  for(let i=1;i<=pageCount;i++){
+    doc.setPage(i);
+    doc.setFillColor(13,17,23);
+    doc.rect(0,289,W,8,'F');
+    doc.setFont('helvetica','normal');doc.setFontSize(7);doc.setTextColor(242,245,248);
+    doc.text('cisepz.fr',W/2,293,{align:'center'});
+    doc.text(`Page ${i}/${pageCount}`,W-margin,293,{align:'right'});
+  }
+  return doc;
+}
+function downloadMultiPDF(){
+  const checked=[...document.querySelectorAll('.multi-chantier-check:checked')].map(el=>el.value);
+  if(!checked.length){showToast('Selectionnez au moins un chantier','err');return}
+  if(!window.jspdf||!window.jspdf.jsPDF){showToast('Bibliotheque PDF non chargee - verifiez votre connexion','err');return}
+  try{
+    const doc=generateMultiPDF(checked);
+    const dateStr=new Date().toISOString().split('T')[0];
+    doc.save(`Liste_Consolidee_CISEPZ_${dateStr}.pdf`);
+    showToast('PDF consolide telecharge !');
+    closeMultiExportModal();
+  }catch(e){console.error(e);showToast('Erreur PDF','err')}
+}
+
+// ===== EMAIL PDF MODAL =====
+function openEmailPDFModal(){
+  if(!getFilteredData().length){showToast('Liste vide','err');return}
+  const info=getDeliveryInfo();
+  const dateStr=new Date().toLocaleDateString('fr-FR');
+  document.getElementById('email-subject').value=`Liste materiel CISEPZ - ${info.site||dateStr}`;
+  document.getElementById('email-recipient').value='';
+  document.getElementById('modal-email-pdf').classList.add('open');
+}
+function closeEmailModal(){document.getElementById('modal-email-pdf').classList.remove('open')}
+
+async function sendPDFEmail(){
+  const recipient=document.getElementById('email-recipient').value.trim();
+  const subject=document.getElementById('email-subject').value.trim()||'Liste materiel CISEPZ';
+  const btn=document.getElementById('modal-send-btn');
+  const label=document.getElementById('modal-send-label');
+
+  label.innerHTML='<span class="spinner"></span>';
+  btn.disabled=true;
+
+  try{
+    const doc=generatePDF();
+    const dateStr=new Date().toISOString().split('T')[0];
+    const filename=`Liste_Materiel_CISEPZ_${dateStr}.pdf`;
+    const result=await shareOrDownloadPDF(doc,filename,subject,buildDeliveryEmailBody(),recipient);
+
+    label.textContent='Envoyer';
+    btn.disabled=false;
+    closeEmailModal();
+    if(result==='shared')showToast('PDF partage !');
+    else if(result==='fallback')showToast('PDF telecharge + Email ouvert - joignez le PDF');
+  }catch(e){
+    console.error(e);
+    label.textContent='Envoyer';
+    btn.disabled=false;
+    showToast('Erreur PDF','err');
+  }
+}
+
+// Close modal on overlay click
+document.getElementById('modal-email-pdf').addEventListener('click',function(e){
+  if(e.target===this)closeEmailModal();
+});
+
+// ===== TEXT PREVIEW / EMAIL / WHATSAPP =====
+let previewOpen=false;
+function togglePreview(){
+  previewOpen=!previewOpen;const box=document.getElementById('preview-box');
+  document.getElementById('preview-btn-text').textContent=previewOpen?"Masquer l'apercu":"Voir l'apercu texte";
+  if(previewOpen){document.getElementById('preview-text').textContent=generateText();box.style.display='block'}
+  else box.style.display='none';
+}
+function generateText(){
+  const info=getDeliveryInfo();
+  const data=getFilteredData();
+  const grouped={};data.forEach(it=>{const k=it.network_type||'Autre';if(!grouped[k])grouped[k]=[];grouped[k].push(it)});
+  const now=new Date();
+  let t='LISTE MATERIEL - CISEPZ Genie Climatique\n'+'='.repeat(48)+'\n';
+  t+=`Date: ${now.toLocaleDateString('fr-FR')} a ${now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}\n`;
+  t+=`Total: ${data.length} element${data.length>1?'s':''}\n`;
+  if(info.companion||info.date||info.location||info.site){
+    t+='\nLIVRAISON:\n';
+    if(info.companion)t+=`  Compagnon: ${info.companion}\n`;
+    if(info.site)t+=`  N° chantier: ${info.site}\n`;
+    if(info.date)t+=`  Date: ${new Date(info.date).toLocaleDateString('fr-FR')}\n`;
+    if(info.location)t+=`  Lieu: ${info.location}\n`;
+  }
+  t+='\n'+'='.repeat(48)+'\n\n';
+  Object.entries(grouped).forEach(([net,items])=>{
+    t+=`-- ${net.toUpperCase()} --\n`;
+    items.forEach(it=>{t+=`  - ${it.item_key} / ${it.diameter} / x${it.quantity}${it.project_name?' ('+it.project_name+')':''}\n`});
+    t+='\n';
+  });
+  t+='Genere par Liste By Cisepz - Genie Climatique\n';
+  return t;
+}
+function copyText(){
+  navigator.clipboard.writeText(document.getElementById('preview-text').textContent).then(()=>showToast('Copie !')).catch(()=>showToast('Erreur copie','err'));
+}
+
+// ===== PARTAGE PDF (avec piece jointe reelle sur mobile) =====
+function isMobileDevice(){
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+}
+async function shareOrDownloadPDF(doc,filename,subject,bodyText,recipient){
+  let file=null;
+  if(isMobileDevice()){
+    try{
+      const pdfBlob=doc.output('blob');
+      file=new File([pdfBlob],filename,{type:'application/pdf'});
+    }catch(e){file=null}
+  }
+
+  if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({files:[file],title:subject,text:bodyText});
+      return 'shared';
+    }catch(err){
+      if(err&&err.name==='AbortError')return 'cancelled';
+      // sinon on bascule sur le repli ci-dessous
+    }
+  }
+  // Repli (ordinateur, ou mobile sans partage fichier fiable) : telechargement + mailto sans PJ automatique
+  const pdfDataUri=doc.output('datauristring');
+  const link=document.createElement('a');
+  link.href=pdfDataUri;link.download=filename;link.click();
+  window.open(`mailto:${recipient||''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`);
+  return 'fallback';
+}
+function buildDeliveryEmailBody(){
+  const info=getDeliveryInfo();
+  let body='Veuillez trouver ci-joint la liste de materiel CISEPZ.\n\n';
+  if(info.companion)body+=`Compagnon: ${info.companion}\n`;
+  if(info.site)body+=`N° chantier: ${info.site}\n`;
+  if(info.date)body+=`Date livraison: ${new Date(info.date).toLocaleDateString('fr-FR')}\n`;
+  if(info.location)body+=`Lieu: ${info.location}\n`;
+  body+=`\nTotal: ${getFilteredData().length} article${getFilteredData().length>1?'s':''}\n`;
+  body+='\n-- Liste generee par Liste By Cisepz - Genie Climatique';
+  return body;
+}
+async function sendEmail(){
+  if(!getFilteredData().length){showToast('Liste vide','err');return}
+  if(!window.jspdf||!window.jspdf.jsPDF){showToast('Bibliotheque PDF non chargee - verifiez votre connexion','err');return}
+  try{
+    const info=getDeliveryInfo();
+    const dateStr=new Date().toISOString().split('T')[0];
+    const filename=`Liste_Materiel_CISEPZ_${dateStr}.pdf`;
+    const subject=`Liste materiel CISEPZ - ${info.site||new Date().toLocaleDateString('fr-FR')}`;
+    const doc=generatePDF();
+    const result=await shareOrDownloadPDF(doc,filename,subject,buildDeliveryEmailBody());
+    if(result==='shared')showToast('PDF partage !');
+    else if(result==='fallback')showToast('PDF telecharge - joignez-le a votre email');
+  }catch(e){console.error(e);showToast('Erreur PDF','err')}
+}
+function sendWhatsApp(){
+  if(!getFilteredData().length){showToast('Liste vide','err');return}
+  window.open(`https://wa.me/?text=${encodeURIComponent(generateText())}`,'_blank');showToast('WhatsApp ouvert !');
+}
+
+// ===== TOAST =====
+let toastTimer;
+function showToast(msg,type='ok'){
+  const t=document.getElementById('toast');t.textContent=msg;t.className='toast show '+(type==='err'?'err':'ok');
+  clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+// ===== SERVICE WORKER =====
+
+// ========== EXCEL EXPORT ==========
+function downloadExcel(){
+  if(!getFilteredData().length){showToast('Liste vide','err');return}
+  if(!window.XLSX){showToast('Chargement en cours...','err');return}
+  try{
+    const d=getDeliveryInfo();
+    const data=getFilteredData();
+    const now=new Date();
+
+    // Build rows
+    const rows=[];
+    // Header info rows
+    rows.push(['LISTE MATERIEL - CISEPZ Genie Climatique','','','','','','']);
+    rows.push(['Date:',now.toLocaleDateString('fr-FR'),'','','','','']);
+    if(d.companion) rows.push(['Compagnon:',d.companion,'','','','','']);
+    if(d.site) rows.push(['N chantier:',d.site,'','','','','']);
+    if(d.date) rows.push(['Date livraison:',new Date(d.date).toLocaleDateString('fr-FR'),'','','','','']);
+    if(d.location) rows.push(['Lieu:',d.location,'','','','','']);
+    rows.push(['','','','','','','']);
+
+    // Column headers
+    rows.push(['RESEAU','MATERIEL','DIAMETRE','QUANTITE','CHANTIER','DATE CREATION','']);
+
+    // Data rows grouped by network
+    const grouped={};
+    data.forEach(it=>{const k=it.network_type||'Autre';if(!grouped[k])grouped[k]=[];grouped[k].push(it)});
+    Object.entries(grouped).forEach(([net,items])=>{
+      items.forEach(it=>{
+        rows.push([
+          net,
+          it.item_key,
+          'O'+it.diameter,
+          it.quantity,
+          it.project_name||'',
+          it.created_at?new Date(it.created_at).toLocaleDateString('fr-FR'):'',
+          ''
+        ]);
+      });
+    });
+
+    rows.push(['','','','','','','']);
+    rows.push(['Total elements:',data.length,'','','','','']);
+
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+
+    // Column widths
+    ws['!cols']=[{wch:18},{wch:42},{wch:12},{wch:10},{wch:20},{wch:16},{wch:5}];
+
+    // Style header row (row 8 = index 7)
+    const headerRow=7;
+    ['A','B','C','D','E','F'].forEach(col=>{
+      const cell=ws[col+(headerRow+1)];
+      if(cell) cell.s={font:{bold:true},fill:{fgColor:{rgb:'0D1117'}},font:{color:{rgb:'F0A500'},bold:true}};
+    });
+
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb,ws,'Liste Materiel');
+
+    const dateStr=now.toISOString().split('T')[0];
+    XLSX.writeFile(wb,'liste-materiel-cisepz-'+dateStr+'.xlsx');
+    showToast('Excel telecharge !');
+  }catch(e){console.error(e);showToast('Erreur Excel','err')}
+}
+
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{})}
+
+migrateChantierFlags();
+if(!localStorage.getItem('cisepz_chantiers_v1')){importOfficialChantiers(true)}
+renderNetworks();updateBadge();updateActiveChantierBanner();
+</script>
+</body>
+</html>
