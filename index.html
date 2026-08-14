@@ -369,7 +369,7 @@ select option{background:var(--surface2);color:var(--text)}
         <span id="modal-send-label">Envoyer</span>
       </button>
     </div>
-    <p style="font-size:10px;color:var(--muted);margin-top:12px;text-align:center">Le PDF s'ouvrira avec votre client email. Joignez-le manuellement si nécessaire.</p>
+    <p style="font-size:10px;color:var(--muted);margin-top:12px;text-align:center">Sur mobile, le PDF est joint automatiquement. Sur ordinateur, il sera téléchargé pour être joint manuellement.</p>
   </div>
 </div>
 
@@ -2137,9 +2137,20 @@ function copyMissingReport(){
 function sendMissingWhatsApp(){
   window.open(`https://wa.me/?text=${encodeURIComponent(generateMissingText())}`,'_blank');
 }
-function sendMissingEmail(){
-  const sub=`Manquants livraison CISEPZ${currentListFilter?' - '+currentListFilter:''}`;
-  window.open(`mailto:?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(generateMissingText())}`);
+async function sendMissingEmail(){
+  const missing=getFilteredData().filter(d=>!d.received);
+  if(!missing.length){showToast('Tout a ete recu !');return}
+  if(!window.jspdf||!window.jspdf.jsPDF){showToast('Bibliotheque PDF non chargee - verifiez votre connexion','err');return}
+  try{
+    const sub=`Manquants livraison CISEPZ${currentListFilter?' - '+currentListFilter:''}`;
+    const dateStr=new Date().toISOString().split('T')[0];
+    const suffix=currentListFilter?'_'+currentListFilter.replace(/[^a-zA-Z0-9]/g,'_'):'';
+    const filename=`Manquants_CISEPZ${suffix}_${dateStr}.pdf`;
+    const doc=generateMissingPDF();
+    const result=await shareOrDownloadPDF(doc,filename,sub,generateMissingText());
+    if(result==='shared')showToast('PDF partage !');
+    else if(result==='fallback')showToast('PDF telecharge - joignez-le a votre email');
+  }catch(e){console.error(e);showToast('Erreur PDF','err')}
 }
 function generateMissingPDF(){
   const {jsPDF}=window.jspdf;
@@ -2514,7 +2525,7 @@ function openEmailPDFModal(){
 }
 function closeEmailModal(){document.getElementById('modal-email-pdf').classList.remove('open')}
 
-function sendPDFEmail(){
+async function sendPDFEmail(){
   const recipient=document.getElementById('email-recipient').value.trim();
   const subject=document.getElementById('email-subject').value.trim()||'Liste materiel CISEPZ';
   const btn=document.getElementById('modal-send-btn');
@@ -2523,44 +2534,23 @@ function sendPDFEmail(){
   label.innerHTML='<span class="spinner"></span>';
   btn.disabled=true;
 
-  setTimeout(()=>{
-    try{
-      const doc=generatePDF();
-      const pdfBlob=doc.output('blob');
-      const pdfDataUri=doc.output('datauristring');
-      const dateStr=new Date().toISOString().split('T')[0];
-      const filename=`Liste_Materiel_CISEPZ_${dateStr}.pdf`;
+  try{
+    const doc=generatePDF();
+    const dateStr=new Date().toISOString().split('T')[0];
+    const filename=`Liste_Materiel_CISEPZ_${dateStr}.pdf`;
+    const result=await shareOrDownloadPDF(doc,filename,subject,buildDeliveryEmailBody(),recipient);
 
-      // Download PDF first
-      const link=document.createElement('a');
-      link.href=pdfDataUri;
-      link.download=filename;
-      link.click();
-
-      // Build email body
-      const info=getDeliveryInfo();
-      let body='Veuillez trouver ci-joint la liste de materiel CISEPZ.\n\n';
-      if(info.companion)body+=`Compagnon: ${info.companion}\n`;
-      if(info.site)body+=`N° chantier: ${info.site}\n`;
-      if(info.date)body+=`Date livraison: ${new Date(info.date).toLocaleDateString('fr-FR')}\n`;
-      if(info.location)body+=`Lieu: ${info.location}\n`;
-      body+=`\nTotal: ${getFilteredData().length} article${getFilteredData().length>1?'s':''}\n`;
-      body+='\n-- Liste generee par Liste By Cisepz - Genie Climatique';
-
-      const mailto=`mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-      window.open(mailto);
-
-      label.textContent='Envoyer';
-      btn.disabled=false;
-      closeEmailModal();
-      showToast('PDF telecharge + Email ouvert !');
-    }catch(e){
-      console.error(e);
-      label.textContent='Envoyer';
-      btn.disabled=false;
-      showToast('Erreur PDF','err');
-    }
-  },300);
+    label.textContent='Envoyer';
+    btn.disabled=false;
+    closeEmailModal();
+    if(result==='shared')showToast('PDF partage !');
+    else if(result==='fallback')showToast('PDF telecharge + Email ouvert - joignez le PDF');
+  }catch(e){
+    console.error(e);
+    label.textContent='Envoyer';
+    btn.disabled=false;
+    showToast('Erreur PDF','err');
+  }
 }
 
 // Close modal on overlay click
@@ -2603,12 +2593,60 @@ function generateText(){
 function copyText(){
   navigator.clipboard.writeText(document.getElementById('preview-text').textContent).then(()=>showToast('Copie !')).catch(()=>showToast('Erreur copie','err'));
 }
-function sendEmail(){
-  if(!getFilteredData().length){showToast('Liste vide','err');return}
+
+// ===== PARTAGE PDF (avec piece jointe reelle sur mobile) =====
+function isMobileDevice(){
+  return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent||'');
+}
+async function shareOrDownloadPDF(doc,filename,subject,bodyText,recipient){
+  let file=null;
+  if(isMobileDevice()){
+    try{
+      const pdfBlob=doc.output('blob');
+      file=new File([pdfBlob],filename,{type:'application/pdf'});
+    }catch(e){file=null}
+  }
+
+  if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
+    try{
+      await navigator.share({files:[file],title:subject,text:bodyText});
+      return 'shared';
+    }catch(err){
+      if(err&&err.name==='AbortError')return 'cancelled';
+      // sinon on bascule sur le repli ci-dessous
+    }
+  }
+  // Repli (ordinateur, ou mobile sans partage fichier fiable) : telechargement + mailto sans PJ automatique
+  const pdfDataUri=doc.output('datauristring');
+  const link=document.createElement('a');
+  link.href=pdfDataUri;link.download=filename;link.click();
+  window.open(`mailto:${recipient||''}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(bodyText)}`);
+  return 'fallback';
+}
+function buildDeliveryEmailBody(){
   const info=getDeliveryInfo();
-  const sub=`Liste materiel CISEPZ - ${info.site||new Date().toLocaleDateString('fr-FR')}`;
-  window.open(`mailto:?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(generateText())}`);
-  showToast('Email ouvert !');
+  let body='Veuillez trouver ci-joint la liste de materiel CISEPZ.\n\n';
+  if(info.companion)body+=`Compagnon: ${info.companion}\n`;
+  if(info.site)body+=`N° chantier: ${info.site}\n`;
+  if(info.date)body+=`Date livraison: ${new Date(info.date).toLocaleDateString('fr-FR')}\n`;
+  if(info.location)body+=`Lieu: ${info.location}\n`;
+  body+=`\nTotal: ${getFilteredData().length} article${getFilteredData().length>1?'s':''}\n`;
+  body+='\n-- Liste generee par Liste By Cisepz - Genie Climatique';
+  return body;
+}
+async function sendEmail(){
+  if(!getFilteredData().length){showToast('Liste vide','err');return}
+  if(!window.jspdf||!window.jspdf.jsPDF){showToast('Bibliotheque PDF non chargee - verifiez votre connexion','err');return}
+  try{
+    const info=getDeliveryInfo();
+    const dateStr=new Date().toISOString().split('T')[0];
+    const filename=`Liste_Materiel_CISEPZ_${dateStr}.pdf`;
+    const subject=`Liste materiel CISEPZ - ${info.site||new Date().toLocaleDateString('fr-FR')}`;
+    const doc=generatePDF();
+    const result=await shareOrDownloadPDF(doc,filename,subject,buildDeliveryEmailBody());
+    if(result==='shared')showToast('PDF partage !');
+    else if(result==='fallback')showToast('PDF telecharge - joignez-le a votre email');
+  }catch(e){console.error(e);showToast('Erreur PDF','err')}
 }
 function sendWhatsApp(){
   if(!getFilteredData().length){showToast('Liste vide','err');return}
